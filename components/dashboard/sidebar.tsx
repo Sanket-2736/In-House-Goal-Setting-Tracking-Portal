@@ -75,21 +75,17 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
   };
 
   const isActive = (href: string) => {
-    // Find the nav item with the longest href that matches the current pathname
     const matchingItems = navItems.filter(item => 
       pathname === item.href || pathname.startsWith(item.href + "/")
     );
     
-    // Sort by length (descending) to get the most specific match
     matchingItems.sort((a, b) => b.href.length - a.href.length);
     
-    // Only return true if this href is the most specific match
     return matchingItems.length > 0 && matchingItems[0].href === href;
   };
 
   return (
     <>
-      {/* Sidebar */}
       <aside
         className={cn(
           "fixed left-0 top-0 z-40 h-screen w-64 border-r border-border bg-card transition-transform duration-300 lg:relative lg:translate-x-0",
@@ -97,10 +93,9 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
         )}
       >
         <div className="flex h-full flex-col">
-          {/* Header */}
           <div className="border-b border-border p-6">
-            <div className="flex items-center justify-between">
-              <Link href="/" className="flex items-center gap-2">
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4">
+              <Link href="/" className="flex items-center gap-4">
                 <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm">AQ</span>
                 </div>
@@ -115,9 +110,8 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
             </div>
           </div>
 
-          {/* User Info */}
           <div className="border-b border-border p-6">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
                 <AvatarFallback>{getInitials(session?.user?.name || "User")}</AvatarFallback>
@@ -131,7 +125,6 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
             </div>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-2">
             {navItems.map((item) => {
               const Icon = item.icon;
@@ -156,7 +149,6 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
             })}
           </nav>
 
-          {/* Footer */}
           <div className="border-t border-border p-4 space-y-2">
             <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 transition-colors">
               <Settings className="w-5 h-5" />
@@ -173,7 +165,6 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
         </div>
       </aside>
 
-      {/* Mobile overlay */}
       {isOpen && (
         <div
           className="fixed inset-0 z-30 bg-black/50 lg:hidden"

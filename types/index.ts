@@ -1,9 +1,5 @@
 import { Types } from "mongoose";
 
-// ============================================================================
-// ENUMS
-// ============================================================================
-
 export type UserRole = "employee" | "manager" | "admin";
 export type UserProvider = "credentials" | "google";
 export type GoalSheetStatus = "draft" | "submitted" | "approved" | "returned" | "locked";
@@ -12,10 +8,6 @@ export type Quarter = "Q1" | "Q2" | "Q3" | "Q4";
 export type UoMType = "numeric_min" | "numeric_max" | "timeline" | "zero";
 export type AuditChangeType = "create" | "update" | "delete" | "approve" | "reject" | "submit" | "lock";
 export type AuditEntityType = "GoalSheet" | "GoalItem" | "CheckIn" | "User" | "GoalCycle";
-
-// ============================================================================
-// USER TYPES
-// ============================================================================
 
 export interface IUserDocument {
   _id: Types.ObjectId;
@@ -45,10 +37,6 @@ export interface IUserDTO {
   isActive: boolean;
 }
 
-// ============================================================================
-// GOAL CYCLE TYPES
-// ============================================================================
-
 export interface IGoalCycleDocument {
   _id: Types.ObjectId;
   name: string;
@@ -77,10 +65,6 @@ export interface IGoalCycleDTO {
   createdBy: string;
 }
 
-// ============================================================================
-// QUARTERLY ACHIEVEMENT TYPES
-// ============================================================================
-
 export interface IQuarterlyAchievementDocument {
   _id?: Types.ObjectId;
   quarter: Quarter;
@@ -98,10 +82,6 @@ export interface IQuarterlyAchievementDTO {
   status: GoalItemStatus;
   progressScore?: number;
 }
-
-// ============================================================================
-// GOAL ITEM TYPES
-// ============================================================================
 
 export interface IGoalItemDocument {
   _id?: Types.ObjectId;
@@ -133,10 +113,6 @@ export interface IGoalItemDTO {
   status: GoalItemStatus;
 }
 
-// ============================================================================
-// GOAL SHEET TYPES
-// ============================================================================
-
 export interface IGoalSheetDocument {
   _id: Types.ObjectId;
   employeeId: Types.ObjectId;
@@ -167,10 +143,6 @@ export interface IGoalSheetDTO {
   updatedAt: Date;
 }
 
-// ============================================================================
-// CHECK-IN TYPES
-// ============================================================================
-
 export interface ICheckInDocument {
   _id: Types.ObjectId;
   goalSheetId: Types.ObjectId;
@@ -195,10 +167,6 @@ export interface ICheckInDTO {
   cycleId: string;
 }
 
-// ============================================================================
-// AUDIT LOG TYPES
-// ============================================================================
-
 export interface IAuditLogDocument {
   _id: Types.ObjectId;
   entityType: AuditEntityType;
@@ -222,10 +190,6 @@ export interface IAuditLogDTO {
   reason?: string;
   timestamp: Date;
 }
-
-// ============================================================================
-// SHARED GOAL TYPES
-// ============================================================================
 
 export interface ISharedGoalRecipientDocument {
   employeeId: Types.ObjectId;
@@ -269,10 +233,6 @@ export interface ISharedGoalDTO {
   recipients: ISharedGoalRecipientDTO[];
 }
 
-// ============================================================================
-// API RESPONSE TYPES
-// ============================================================================
-
 export interface ApiResponse<T> {
   success: boolean;
   data?: T;
@@ -292,10 +252,6 @@ export interface PaginatedResponse<T> {
   };
   error?: string;
 }
-
-// ============================================================================
-// REQUEST/RESPONSE TYPES
-// ============================================================================
 
 export interface CreateGoalSheetRequest {
   employeeId: string;
@@ -326,10 +282,6 @@ export interface CreateSharedGoalRequest {
   cycleId: string;
   recipients: ISharedGoalRecipientDTO[];
 }
-
-// ============================================================================
-// LEGACY TYPES (for backward compatibility)
-// ============================================================================
 
 export type UserRoleType = UserRole;
 export type GoalStatus = "not_started" | "in_progress" | "completed" | "on_hold";

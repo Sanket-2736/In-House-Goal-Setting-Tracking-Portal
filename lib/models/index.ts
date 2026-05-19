@@ -1,8 +1,3 @@
-/**
- * Central export file for all Mongoose models
- * Ensures proper handling of Next.js hot reload by checking if models already exist
- */
-
 export { User, type IUser } from "./User";
 export { GoalCycle, type IGoalCycle } from "./GoalCycle";
 export { GoalSheet, type IGoalSheet, type IGoalItem, type IQuarterlyAchievement } from "./GoalSheet";

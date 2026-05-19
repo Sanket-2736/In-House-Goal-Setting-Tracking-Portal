@@ -262,7 +262,6 @@ export default function AdminUsersPage() {
         </Card>
       )}
 
-      {/* Filters and Actions */}
       <div className="space-y-4">
         <div className="flex gap-2">
           <Button onClick={() => setAddUserDialogOpen(true)} className="gap-2">

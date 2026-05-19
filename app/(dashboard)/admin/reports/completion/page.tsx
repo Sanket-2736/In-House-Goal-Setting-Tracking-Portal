@@ -100,7 +100,6 @@ export default function CompletionDashboardPage() {
     fetchCycles();
   }, []);
 
-  // Fetch departments
   useEffect(() => {
     const fetchDepartments = async () => {
       try {
@@ -119,7 +118,6 @@ export default function CompletionDashboardPage() {
     fetchDepartments();
   }, []);
 
-  // Fetch completion data
   const fetchCompletionData = async () => {
     if (!selectedCycle) {
       toast.error("Please select a cycle");
@@ -149,7 +147,6 @@ export default function CompletionDashboardPage() {
     }
   };
 
-  // Auto-refresh
   useEffect(() => {
     if (!autoRefresh || !selectedCycle) return;
 
@@ -160,7 +157,6 @@ export default function CompletionDashboardPage() {
     return () => clearInterval(interval);
   }, [autoRefresh, selectedCycle, selectedDepartment, selectedQuarter]);
 
-  // Initial load
   useEffect(() => {
     if (selectedCycle) {
       fetchCompletionData();
@@ -195,7 +191,6 @@ export default function CompletionDashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Completion Dashboard</h1>

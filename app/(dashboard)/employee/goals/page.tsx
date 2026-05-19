@@ -39,9 +39,6 @@ export default function GoalsPage() {
     const fetchGoalSheets = async () => {
       try {
         setIsLoading(true);
-        // Fetch all goal sheets for the current user
-        // Note: This would require a new API endpoint to fetch all sheets
-        // For now, we'll fetch the active cycle and then the sheet for that cycle
         const cycleResponse = await apiGet("/api/goals/cycles/active", { showToast: false });
         if (cycleResponse?.success && cycleResponse.data) {
           const sheetResponse = await apiGet(`/api/goals/sheet?cycleId=${cycleResponse.data._id}`, { showToast: false });
@@ -98,7 +95,6 @@ export default function GoalsPage() {
         breadcrumbs={[{ label: "Goals" }]}
       />
 
-      {/* Create New Button */}
       <Link href="/employee/goals/new">
         <Button>
           <Plus className="w-4 h-4 mr-2" />
@@ -106,7 +102,6 @@ export default function GoalsPage() {
         </Button>
       </Link>
 
-      {/* Goal Sheets Table */}
       <Card>
         <CardHeader>
           <CardTitle>Goal Sheets</CardTitle>

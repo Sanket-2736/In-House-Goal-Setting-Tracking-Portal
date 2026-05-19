@@ -34,7 +34,6 @@ export function TopBar({ session, cycleName, onMenuClick }: TopBarProps) {
   return (
     <header className="border-b border-border bg-background sticky top-0 z-20">
       <div className="flex items-center justify-between px-4 sm:px-6 py-4">
-        {/* Left side - Menu button and cycle info */}
         <div className="flex items-center gap-4">
           <button
             onClick={onMenuClick}
@@ -50,12 +49,9 @@ export function TopBar({ session, cycleName, onMenuClick }: TopBarProps) {
           )}
         </div>
 
-        {/* Right side - Notifications and user menu */}
         <div className="flex items-center gap-4">
-          {/* Notification Bell */}
           <NotificationBell />
 
-          {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
