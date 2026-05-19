@@ -38,7 +38,6 @@ export async function PUT(
 
     const oldValue = rule.toObject();
 
-    // Update fields
     if (triggerType) rule.triggerType = triggerType;
     if (daysAfterTrigger) rule.daysAfterTrigger = daysAfterTrigger;
     if (notifyRecipients) rule.notifyRecipients = notifyRecipients;

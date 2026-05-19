@@ -183,9 +183,9 @@ export default function CompletionDashboardPage() {
   };
 
   const getRowColor = (isOverdue: boolean, isInProgress: boolean, isComplete: boolean) => {
-    if (isOverdue) return "bg-red-50 hover:bg-red-100";
-    if (isInProgress) return "bg-yellow-50 hover:bg-yellow-100";
-    if (isComplete) return "bg-green-50 hover:bg-green-100";
+    if (isOverdue) return "bg-red-50/50 hover:bg-red-100/50 dark:bg-red-950/30 dark:hover:bg-red-950/50";
+    if (isInProgress) return "bg-yellow-50/50 hover:bg-yellow-100/50 dark:bg-yellow-950/30 dark:hover:bg-yellow-950/50";
+    if (isComplete) return "bg-green-50/50 hover:bg-green-100/50 dark:bg-green-950/30 dark:hover:bg-green-950/50";
     return "";
   };
 
@@ -199,7 +199,7 @@ export default function CompletionDashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Completion Dashboard</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Real-time view of submission and check-in status
           </p>
         </div>
@@ -300,7 +300,7 @@ export default function CompletionDashboardPage() {
                 <div className="text-3xl font-bold">
                   {completionData.employeeSubmissionStatus.length}
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Total Employees</p>
+                <p className="text-sm text-muted-foreground mt-1">Total Employees</p>
               </div>
             </CardContent>
           </Card>
@@ -308,14 +308,14 @@ export default function CompletionDashboardPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400">
                   {
                     completionData.employeeSubmissionStatus.filter(
                       (e) => e.isComplete
                     ).length
                   }
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Submitted</p>
+                <p className="text-sm text-muted-foreground mt-1">Submitted</p>
               </div>
             </CardContent>
           </Card>
@@ -323,14 +323,14 @@ export default function CompletionDashboardPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-yellow-600">
+                <div className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                   {
                     completionData.employeeSubmissionStatus.filter(
                       (e) => e.isInProgress
                     ).length
                   }
                 </div>
-                <p className="text-sm text-gray-600 mt-1">In Progress</p>
+                <p className="text-sm text-muted-foreground mt-1">In Progress</p>
               </div>
             </CardContent>
           </Card>
@@ -338,14 +338,14 @@ export default function CompletionDashboardPage() {
           <Card>
             <CardContent className="pt-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-red-600">
+                <div className="text-3xl font-bold text-red-600 dark:text-red-400">
                   {
                     completionData.employeeSubmissionStatus.filter(
                       (e) => e.isOverdue
                     ).length
                   }
                 </div>
-                <p className="text-sm text-gray-600 mt-1">Overdue</p>
+                <p className="text-sm text-muted-foreground mt-1">Overdue</p>
               </div>
             </CardContent>
           </Card>
@@ -385,7 +385,7 @@ export default function CompletionDashboardPage() {
                     >
                       <TableCell className="font-medium">
                         {emp.employeeName}
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-muted-foreground">
                           {emp.employeeId}
                         </div>
                       </TableCell>
@@ -407,7 +407,7 @@ export default function CompletionDashboardPage() {
               </Table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               Loading employee submission status...
             </div>
           )}
@@ -482,7 +482,7 @@ export default function CompletionDashboardPage() {
               </Table>
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               Loading manager check-in status...
             </div>
           )}
@@ -494,15 +494,15 @@ export default function CompletionDashboardPage() {
         <CardContent className="pt-6">
           <div className="flex flex-wrap gap-6">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-red-100 border border-red-300 rounded"></div>
+              <div className="w-4 h-4 bg-red-100 border border-red-300 dark:bg-red-950/50 dark:border-red-800 rounded"></div>
               <span className="text-sm">Overdue</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 rounded"></div>
+              <div className="w-4 h-4 bg-yellow-100 border border-yellow-300 dark:bg-yellow-950/50 dark:border-yellow-800 rounded"></div>
               <span className="text-sm">In Progress</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 bg-green-100 border border-green-300 rounded"></div>
+              <div className="w-4 h-4 bg-green-100 border border-green-300 dark:bg-green-950/50 dark:border-green-800 rounded"></div>
               <span className="text-sm">Complete</span>
             </div>
           </div>

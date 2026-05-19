@@ -6,7 +6,6 @@ if (!MONGODB_URI) {
   throw new Error("Please define the MONGODB_URI environment variable inside .env.local");
 }
 
-// Extend the global namespace to include mongoose cache
 interface MongooseCache {
   conn: typeof mongoose | null;
   promise: Promise<typeof mongoose> | null;
@@ -22,10 +21,6 @@ if (!cached) {
   cached = global.mongooseCache = { conn: null, promise: null };
 }
 
-/**
- * Connect to MongoDB with caching to avoid hot-reload issues in Next.js
- * This ensures we reuse the same connection across hot reloads
- */
 export async function connectDB(): Promise<typeof mongoose> {
   if (cached!.conn) {
     return cached!.conn;
@@ -61,9 +56,6 @@ export async function connectDB(): Promise<typeof mongoose> {
   return cached!.conn;
 }
 
-/**
- * Disconnect from MongoDB
- */
 export async function disconnectDB(): Promise<void> {
   if (cached!.conn) {
     await mongoose.disconnect();

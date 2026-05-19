@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
 import { analyzeGoalQuality } from "@/lib/cerebras/goalScorer";
 
-// Simple in-memory rate limiting (per user per session)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
-const RATE_LIMIT = 3; // Max 3 calls per user per session
-const RATE_LIMIT_WINDOW = 60 * 60 * 1000; // 1 hour
+const RATE_LIMIT = 3;
+const RATE_LIMIT_WINDOW = 60 * 60 * 1000;
 
 /**
  * POST /api/goals/analyze
@@ -33,7 +32,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check rate limit
     const now = Date.now();
     const userLimit = rateLimitMap.get(user.id);
 
@@ -49,15 +47,12 @@ export async function POST(request: NextRequest) {
         }
         userLimit.count++;
       } else {
-        // Reset window
         rateLimitMap.set(user.id, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
       }
     } else {
-      // First request
       rateLimitMap.set(user.id, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     }
 
-    // Analyze goals
     const report = await analyzeGoalQuality(goals);
 
     return NextResponse.json(

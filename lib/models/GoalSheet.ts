@@ -1,13 +1,12 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Quarterly Achievement embedded schema
 export interface IQuarterlyAchievement {
   _id?: mongoose.Types.ObjectId;
   quarter: "Q1" | "Q2" | "Q3" | "Q4";
   actual: number;
   completionDate?: Date;
   status: "not_started" | "on_track" | "completed";
-  progressScore?: number; // Computed field
+  progressScore?: number;
   updatedAt?: Date;
 }
 
@@ -41,7 +40,6 @@ const quarterlyAchievementSchema = new Schema<IQuarterlyAchievement>(
   { _id: true }
 );
 
-// Goal Item embedded schema
 export interface IGoalItem {
   _id?: mongoose.Types.ObjectId;
   thrustArea: string;
@@ -49,7 +47,7 @@ export interface IGoalItem {
   description?: string;
   uomType: "numeric_min" | "numeric_max" | "timeline" | "zero";
   target: number;
-  targetDate?: Date; // For timeline UoM
+  targetDate?: Date;
   weightage: number;
   isShared: boolean;
   sharedFromId?: mongoose.Types.ObjectId;
@@ -105,7 +103,6 @@ const goalItemSchema = new Schema<IGoalItem>(
   { _id: true }
 );
 
-// Goal Sheet main schema
 export interface IGoalSheet extends Document {
   _id: mongoose.Types.ObjectId;
   employeeId: mongoose.Types.ObjectId;
@@ -116,7 +113,7 @@ export interface IGoalSheet extends Document {
   approvedAt?: Date;
   lockedAt?: Date;
   goals: IGoalItem[];
-  totalWeightage?: number; // Virtual field
+  totalWeightage?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -157,15 +154,12 @@ const goalSheetSchema = new Schema<IGoalSheet>(
   }
 );
 
-// Virtual field for total weightage
 goalSheetSchema.virtual("totalWeightage").get(function () {
   return this.goals.reduce((sum, goal) => sum + (goal.weightage || 0), 0);
 });
 
-// Ensure virtuals are included in JSON
 goalSheetSchema.set("toJSON", { virtuals: true });
 
-// Index for faster queries
 goalSheetSchema.index({ employeeId: 1, cycleId: 1 }, { unique: true });
 goalSheetSchema.index({ cycleId: 1 });
 goalSheetSchema.index({ status: 1 });

@@ -71,7 +71,6 @@ const escalationRuleSchema = new Schema<IEscalationRule>(
   }
 );
 
-// Index for faster queries
 escalationRuleSchema.index({ triggerType: 1 });
 escalationRuleSchema.index({ isActive: 1 });
 escalationRuleSchema.index({ createdBy: 1 });

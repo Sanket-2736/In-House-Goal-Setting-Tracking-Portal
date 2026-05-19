@@ -17,7 +17,6 @@ export async function PUT(
     const { id } = await params;
     const user = await requireAuth();
 
-    // Only admins can update shared goals
     if (user.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized: Only admins can update shared goals" },
@@ -26,7 +25,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { recipientUpdates } = body; // Array of { employeeId, weightage }
+    const { recipientUpdates } = body;
 
     if (!Array.isArray(recipientUpdates) || recipientUpdates.length === 0) {
       return NextResponse.json(
@@ -45,7 +44,6 @@ export async function PUT(
       );
     }
 
-    // Update weightages for existing recipients
     for (const update of recipientUpdates) {
       const recipientIndex = sharedGoal.recipients.findIndex(
         (r) => r.employeeId.toString() === update.employeeId
@@ -55,7 +53,6 @@ export async function PUT(
         const oldWeightage = sharedGoal.recipients[recipientIndex].weightage;
         sharedGoal.recipients[recipientIndex].weightage = update.weightage;
 
-        // Update the goal sheet
         if (sharedGoal.recipients[recipientIndex].goalSheetId) {
           const goalSheet = await GoalSheet.findById(
             sharedGoal.recipients[recipientIndex].goalSheetId
@@ -73,7 +70,6 @@ export async function PUT(
           }
         }
 
-        // Create audit log for weightage change
         await AuditLog.create({
           entityType: "SharedGoal",
           entityId: sharedGoal._id,

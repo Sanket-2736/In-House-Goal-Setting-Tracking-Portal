@@ -32,7 +32,6 @@ export async function checkAndTriggerEscalations(): Promise<EscalationResult> {
   try {
     await connectDB();
 
-    // Get all active escalation rules
     const rules = await EscalationRule.find({ isActive: true });
 
     if (rules.length === 0) {
@@ -41,7 +40,6 @@ export async function checkAndTriggerEscalations(): Promise<EscalationResult> {
 
     const now = new Date();
 
-    // Process each rule type
     for (const rule of rules) {
       try {
         if (rule.triggerType === "goal_not_submitted") {
@@ -92,7 +90,6 @@ async function checkGoalNotSubmitted(
       triggerDate.setDate(triggerDate.getDate() + rule.daysAfterTrigger);
 
       if (now >= triggerDate) {
-        // Find employees who haven't submitted
         const unsubmittedSheets = await GoalSheet.find({
           cycleId: cycle._id,
           status: "draft",
@@ -100,7 +97,6 @@ async function checkGoalNotSubmitted(
 
         for (const sheet of unsubmittedSheets) {
           const employee = sheet.employeeId as any;
-          // Check if escalation already exists for this sheet
           const existingEscalation = await EscalationLog.findOne({
             ruleId: rule._id,
             userId: employee._id,
@@ -113,7 +109,6 @@ async function checkGoalNotSubmitted(
               (now.getTime() - triggerDate.getTime()) / (1000 * 60 * 60 * 24)
             );
 
-            // Create escalation log
             const escalationLog = await EscalationLog.create({
               ruleId: rule._id,
               userId: employee._id,
@@ -127,7 +122,6 @@ async function checkGoalNotSubmitted(
 
             triggered++;
 
-            // Create notifications
             const notificationCount = await createNotifications(
               employee,
               rule.notifyRecipients,
@@ -160,7 +154,6 @@ async function checkGoalNotApproved(
   let notifications = 0;
 
   try {
-    // Find submitted but not approved sheets
     const submittedSheets = await GoalSheet.find({
       status: "submitted",
       submittedAt: { $exists: true },
@@ -173,7 +166,6 @@ async function checkGoalNotApproved(
       triggerDate.setDate(triggerDate.getDate() + rule.daysAfterTrigger);
 
       if (now >= triggerDate) {
-        // Check if escalation already exists
         const existingEscalation = await EscalationLog.findOne({
           ruleId: rule._id,
           userId: employee._id,
@@ -186,7 +178,6 @@ async function checkGoalNotApproved(
             (now.getTime() - triggerDate.getTime()) / (1000 * 60 * 60 * 24)
           );
 
-          // Create escalation log
           const escalationLog = await EscalationLog.create({
             ruleId: rule._id,
             userId: employee._id,
@@ -200,7 +191,6 @@ async function checkGoalNotApproved(
 
           triggered++;
 
-          // Create notifications for manager
           const manager = await User.findById(employee.managerId);
           if (manager) {
             const notificationCount = await createNotifications(
@@ -239,7 +229,6 @@ async function checkCheckInNotCompleted(
     const cycles = await GoalCycle.find({ isActive: true });
 
     for (const cycle of cycles) {
-      // Determine current quarter
       const quarters = [
         { name: "Q1", date: cycle.q1Open },
         { name: "Q2", date: cycle.q2Open },
@@ -252,7 +241,6 @@ async function checkCheckInNotCompleted(
         triggerDate.setDate(triggerDate.getDate() + rule.daysAfterTrigger);
 
         if (now >= triggerDate) {
-          // Find approved goal sheets for this cycle
           const approvedSheets = await GoalSheet.find({
             cycleId: cycle._id,
             status: "approved",
@@ -260,14 +248,12 @@ async function checkCheckInNotCompleted(
 
           for (const sheet of approvedSheets) {
             const employee = sheet.employeeId as any;
-            // Check if check-in exists for this quarter
             const checkInExists = await CheckIn.findOne({
               goalSheetId: sheet._id,
               quarter: quarter.name as "Q1" | "Q2" | "Q3" | "Q4",
             });
 
             if (!checkInExists) {
-              // Check if escalation already exists
               const existingEscalation = await EscalationLog.findOne({
                 ruleId: rule._id,
                 userId: employee._id,
@@ -280,7 +266,6 @@ async function checkCheckInNotCompleted(
                   (now.getTime() - triggerDate.getTime()) / (1000 * 60 * 60 * 24)
                 );
 
-                // Create escalation log
                 const escalationLog = await EscalationLog.create({
                   ruleId: rule._id,
                   userId: employee._id,
@@ -294,7 +279,6 @@ async function checkCheckInNotCompleted(
 
                 triggered++;
 
-                // Create notifications
                 const notificationCount = await createNotifications(
                   employee,
                   rule.notifyRecipients,
@@ -332,7 +316,6 @@ async function createNotifications(
   let count = 0;
 
   try {
-    // Notify employee
     if (recipients.includes("employee")) {
       await Notification.create({
         userId: user._id,
@@ -346,7 +329,6 @@ async function createNotifications(
       count++;
     }
 
-    // Notify manager
     if (recipients.includes("manager") && user.managerId) {
       await Notification.create({
         userId: user.managerId,
@@ -360,7 +342,6 @@ async function createNotifications(
       count++;
     }
 
-    // Notify skip-level manager
     if (recipients.includes("skip_level") && user.managerId) {
       const manager = await User.findById(user.managerId);
       if (manager && manager.managerId) {
@@ -377,7 +358,6 @@ async function createNotifications(
       }
     }
 
-    // Notify HR (all admins)
     if (recipients.includes("hr")) {
       const admins = await User.find({ role: "admin" });
       for (const admin of admins) {

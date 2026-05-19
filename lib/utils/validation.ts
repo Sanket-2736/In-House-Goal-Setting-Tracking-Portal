@@ -1,9 +1,5 @@
 import { z } from "zod";
 
-// ============================================================================
-// AUTH SCHEMAS
-// ============================================================================
-
 export const loginSchema = z.object({
   email: z.email("Invalid email address"),
   password: z.string().min(1, "Password is required"),
@@ -22,10 +18,6 @@ export const registerSchema = z
     message: "Passwords don't match",
     path: ["confirmPassword"],
   });
-
-// ============================================================================
-// GOAL SCHEMAS
-// ============================================================================
 
 export const goalItemSchema = z.object({
   thrustArea: z.string().min(1, "Thrust area is required"),
@@ -50,19 +42,11 @@ export const updateGoalSheetSchema = z.object({
   goals: z.array(goalItemSchema).optional(),
 });
 
-// ============================================================================
-// CHECK-IN SCHEMAS
-// ============================================================================
-
 export const checkInSchema = z.object({
   goalSheetId: z.string(),
   quarter: z.enum(["Q1", "Q2", "Q3", "Q4"]),
   comment: z.string().optional(),
 });
-
-// ============================================================================
-// GOAL CYCLE SCHEMAS
-// ============================================================================
 
 export const goalCycleSchema = z.object({
   name: z.string().min(1, "Cycle name is required"),
@@ -73,10 +57,6 @@ export const goalCycleSchema = z.object({
   q3Open: z.date(),
   q4Open: z.date(),
 });
-
-// ============================================================================
-// TYPE EXPORTS
-// ============================================================================
 
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterInput = z.infer<typeof registerSchema>;

@@ -94,7 +94,6 @@ const sharedGoalSchema = new Schema<ISharedGoal>(
   }
 );
 
-// Index for faster queries
 sharedGoalSchema.index({ cycleId: 1 });
 sharedGoalSchema.index({ createdBy: 1 });
 sharedGoalSchema.index({ sourceGoalId: 1 });

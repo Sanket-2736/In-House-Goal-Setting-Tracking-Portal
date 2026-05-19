@@ -4,7 +4,6 @@ import { User } from "@/lib/models/User";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
-// Validation schema
 const registerSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
@@ -18,16 +17,12 @@ type RegisterInput = z.infer<typeof registerSchema>;
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
     const body = await request.json();
 
-    // Validate input
     const validatedData = registerSchema.parse(body);
 
-    // Connect to database
     await connectDB();
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email: validatedData.email });
 
     if (existingUser) {
@@ -37,7 +32,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if employeeId is already taken (if provided)
     if (validatedData.employeeId) {
       const existingEmployeeId = await User.findOne({
         employeeId: validatedData.employeeId,
@@ -51,11 +45,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Hash password
     const salt = await bcrypt.genSalt(12);
     const hashedPassword = await bcrypt.hash(validatedData.password, salt);
 
-    // Create new user
     const newUser = await User.create({
       name: validatedData.name,
       email: validatedData.email,
@@ -67,7 +59,6 @@ export async function POST(request: NextRequest) {
       isActive: true,
     });
 
-    // Return success response (without password)
     return NextResponse.json(
       {
         success: true,
@@ -82,7 +73,6 @@ export async function POST(request: NextRequest) {
       { status: 201 }
     );
   } catch (error) {
-    // Handle validation errors
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
@@ -93,7 +83,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Handle other errors
     console.error("Registration error:", error);
     return NextResponse.json(
       { error: "Registration failed. Please try again." },

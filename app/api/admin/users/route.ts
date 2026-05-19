@@ -23,7 +23,6 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Build filter
     const filter: any = {};
     if (search) {
       filter.$or = [
@@ -84,7 +83,6 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return NextResponse.json(
@@ -93,10 +91,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
     const hashedPassword = password ? await bcrypt.hash(password, 10) : null;
 
-    // Create user
     const user = await User.create({
       name,
       email,

@@ -49,7 +49,6 @@ const notificationSchema = new Schema<INotification>(
   }
 );
 
-// Index for faster queries
 notificationSchema.index({ userId: 1, isRead: 1 });
 notificationSchema.index({ userId: 1, createdAt: -1 });
 

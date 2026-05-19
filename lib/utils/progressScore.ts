@@ -15,52 +15,41 @@ export function calculateProgressScore(
   target: number,
   targetDate?: Date | null
 ): number {
-  // If no actual value provided, return 0
   if (actual === null || actual === undefined) {
     return 0;
   }
 
   switch (uomType) {
     case "numeric_max":
-      // Higher is better: (actual / target) * 100, capped at 150%
       return Math.min((actual / target) * 100, 150);
 
     case "numeric_min":
-      // Lower is better: (target / actual) * 100, capped at 150%
-      // Avoid division by zero
       if (actual === 0) return 0;
       return Math.min((target / actual) * 100, 150);
 
     case "timeline":
-      // If completion date <= target date: 100%
-      // Otherwise: calculate penalty based on days late
       if (!targetDate) return 0;
 
       const completionDate = new Date(targetDate);
       const targetDateObj = new Date(targetDate);
       const today = new Date();
 
-      // If target date hasn't passed yet, can't calculate
       if (today < targetDateObj) {
         return 0;
       }
 
-      // If completed on time or early
       if (completionDate <= targetDateObj) {
         return 100;
       }
 
-      // Calculate days late
       const daysLate = Math.floor(
         (completionDate.getTime() - targetDateObj.getTime()) / (1000 * 60 * 60 * 24)
       );
 
-      // Penalty: 1% per day late, minimum 0%
       const score = Math.max(100 - daysLate, 0);
       return Math.min(score, 150);
 
     case "zero":
-      // If actual = 0: 100%, else 0%
       return actual === 0 ? 100 : 0;
 
     default:

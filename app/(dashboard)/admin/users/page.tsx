@@ -30,8 +30,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Label } from "@/components/ui/label";
-import { AlertCircle, Plus, Upload, MoreHorizontal } from "lucide-react";
+import { AlertCircle, Plus, Upload, MoreHorizontal, Edit, Trash2, Lock, Unlock } from "lucide-react";
 import { format } from "date-fns";
 
 interface User {
@@ -65,6 +72,16 @@ export default function AdminUsersPage() {
   const [addUserDialogOpen, setAddUserDialogOpen] = useState(false);
   const [bulkImportDialogOpen, setBulkImportDialogOpen] = useState(false);
   const [csvFile, setCsvFile] = useState<File | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [editUserDialogOpen, setEditUserDialogOpen] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    employeeId: "",
+    department: "",
+    role: "employee" as "employee" | "manager" | "admin",
+    password: "",
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -102,6 +119,77 @@ export default function AdminUsersPage() {
       setError(errorMsg);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setEditUserDialogOpen(true);
+  };
+
+  const handleToggleUserStatus = async (user: User) => {
+    try {
+      const response = await fetch(`/api/admin/users/${user._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isActive: !user.isActive }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update user status");
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update user status");
+    }
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    if (!confirm(`Are you sure you want to delete ${user.name}?`)) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/users/${user._id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete user");
+      }
+
+      await fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete user");
+    }
+  };
+
+  const handleAddUser = async () => {
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to create user");
+      }
+
+      setAddUserDialogOpen(false);
+      setNewUser({
+        name: "",
+        email: "",
+        employeeId: "",
+        department: "",
+        role: "employee",
+        password: "",
+      });
+      await fetchUsers();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create user");
     }
   };
 
@@ -277,9 +365,38 @@ export default function AdminUsersPage() {
                     {format(new Date(user.createdAt), "MMM dd, yyyy")}
                   </TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="sm">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleToggleUserStatus(user)}>
+                          {user.isActive ? (
+                            <>
+                              <Lock className="h-4 w-4 mr-2" />
+                              Deactivate
+                            </>
+                          ) : (
+                            <>
+                              <Unlock className="h-4 w-4 mr-2" />
+                              Activate
+                            </>
+                          )}
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={() => handleDeleteUser(user)} className="text-destructive">
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -325,23 +442,59 @@ export default function AdminUsersPage() {
           <div className="space-y-4">
             <div>
               <Label>Name</Label>
-              <Input placeholder="Full name" className="mt-1" />
+              <Input
+                placeholder="Full name"
+                className="mt-1"
+                value={newUser.name}
+                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+              />
             </div>
             <div>
               <Label>Email</Label>
-              <Input type="email" placeholder="email@example.com" className="mt-1" />
+              <Input
+                type="email"
+                placeholder="email@example.com"
+                className="mt-1"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Password</Label>
+              <Input
+                type="password"
+                placeholder="Enter password"
+                className="mt-1"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              />
             </div>
             <div>
               <Label>Employee ID</Label>
-              <Input placeholder="EMP001" className="mt-1" />
+              <Input
+                placeholder="EMP001"
+                className="mt-1"
+                value={newUser.employeeId}
+                onChange={(e) => setNewUser({ ...newUser, employeeId: e.target.value })}
+              />
             </div>
             <div>
               <Label>Department</Label>
-              <Input placeholder="Engineering" className="mt-1" />
+              <Input
+                placeholder="Engineering"
+                className="mt-1"
+                value={newUser.department}
+                onChange={(e) => setNewUser({ ...newUser, department: e.target.value })}
+              />
             </div>
             <div>
               <Label>Role</Label>
-              <Select>
+              <Select
+                value={newUser.role}
+                onValueChange={(value: "employee" | "manager" | "admin") =>
+                  setNewUser({ ...newUser, role: value })
+                }
+              >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="Select role" />
                 </SelectTrigger>
@@ -357,7 +510,9 @@ export default function AdminUsersPage() {
             <Button variant="outline" onClick={() => setAddUserDialogOpen(false)}>
               Cancel
             </Button>
-            <Button>Create User</Button>
+            <Button onClick={handleAddUser} disabled={!newUser.name || !newUser.email || !newUser.password}>
+              Create User
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -48,11 +48,10 @@ const auditLogSchema = new Schema<IAuditLog>(
     },
   },
   {
-    timestamps: false, // We use timestamp field instead
+    timestamps: false,
   }
 );
 
-// Index for faster queries
 auditLogSchema.index({ entityType: 1, entityId: 1 });
 auditLogSchema.index({ changedBy: 1 });
 auditLogSchema.index({ timestamp: -1 });

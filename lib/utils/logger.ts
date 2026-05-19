@@ -30,12 +30,10 @@ class Logger {
 
     this.logs.push(entry);
 
-    // Keep only recent logs
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(-this.maxLogs);
     }
 
-    // Log to console in development
     if (process.env.NODE_ENV === "development") {
       const style = this.getConsoleStyle(level);
       console.log(
@@ -77,9 +75,6 @@ class Logger {
     this.addLog("success", message, data);
   }
 
-  /**
-   * Log API call with timing
-   */
   apiCall(
     method: string,
     endpoint: string,
@@ -92,23 +87,14 @@ class Logger {
     this.addLog(level, message, data);
   }
 
-  /**
-   * Get all logs
-   */
   getLogs(): LogEntry[] {
     return [...this.logs];
   }
 
-  /**
-   * Clear logs
-   */
   clear(): void {
     this.logs = [];
   }
 
-  /**
-   * Export logs as JSON
-   */
   export(): string {
     return JSON.stringify(this.logs, null, 2);
   }

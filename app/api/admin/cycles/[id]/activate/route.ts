@@ -18,10 +18,8 @@ export async function POST(
 
     await connectDB();
 
-    // Deactivate all other cycles
     await GoalCycle.updateMany({ _id: { $ne: id } }, { isActive: false });
 
-    // Activate this cycle
     const cycle = await GoalCycle.findByIdAndUpdate(
       id,
       { isActive: true },

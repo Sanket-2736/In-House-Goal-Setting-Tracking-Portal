@@ -1,8 +1,5 @@
 import { logger } from "./logger";
 
-/**
- * Wrapper around fetch that automatically logs API calls
- */
 export async function fetchWithLogging(
   url: string,
   options?: RequestInit

@@ -61,7 +61,6 @@ const goalCycleSchema = new Schema<IGoalCycle>(
   }
 );
 
-// Index for faster queries
 goalCycleSchema.index({ year: 1 });
 goalCycleSchema.index({ isActive: 1 });
 goalCycleSchema.index({ createdBy: 1 });

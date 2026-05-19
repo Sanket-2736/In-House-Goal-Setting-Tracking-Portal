@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    // Only admins can access analytics
     if (user.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized: Only admins can access analytics" },
@@ -34,7 +33,6 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Fetch all approved/locked goal sheets for the cycle
     const goalSheets = await GoalSheet.find({
       cycleId: new Types.ObjectId(cycleId),
       status: { $in: ["approved", "locked"] },
@@ -42,7 +40,6 @@ export async function GET(request: NextRequest) {
       .populate("employeeId", "name email department employeeId managerId")
       .populate("cycleId", "name year");
 
-    // Build analytics data based on view
     let analyticsData: any = {};
 
     if (view === "overview" || view === "all") {
@@ -125,7 +122,6 @@ function getOverviewData(goalSheets: any[]) {
     }
   }
 
-  // Calculate KPIs
   const avgAchievement =
     allAchievements.length > 0
       ? Math.round(
@@ -148,7 +144,6 @@ function getOverviewData(goalSheets: any[]) {
 
   const submissionRate = goalSheets.length > 0 ? Math.round((submittedCount / goalSheets.length) * 100) : 0;
 
-  // Department progress by quarter
   const departmentQuarterData: any[] = [];
   for (const [dept, data] of Object.entries(departmentProgress)) {
     const avg = data.count > 0 ? Math.round((data.total / data.count) * 100) / 100 : 0;
@@ -205,7 +200,6 @@ function getTrendsData(goalSheets: any[]) {
     }
   }
 
-  // Calculate averages
   const trendData = [
     {
       quarter: "Q1",
@@ -225,7 +219,6 @@ function getTrendsData(goalSheets: any[]) {
     },
   ];
 
-  // Department trends
   const departmentTrendData = Object.entries(departmentTrends).map(([dept, quarters]) => ({
     department: dept,
     Q1: quarters.Q1.length > 0 ? Math.round((quarters.Q1.reduce((a, b) => a + b, 0) / quarters.Q1.length) * 100) / 100 : 0,
@@ -300,7 +293,6 @@ async function getManagerEffectivenessData(goalSheets: any[], cycleId: string) {
   const managerData = [];
 
   for (const manager of managers) {
-    // Get team members
     const teamMembers = await User.find({
       managerId: manager._id,
       role: "employee",
@@ -308,7 +300,6 @@ async function getManagerEffectivenessData(goalSheets: any[], cycleId: string) {
 
     const teamSize = teamMembers.length;
 
-    // Get check-ins completed
     const checkIns = await CheckIn.find({
       cycleId: new Types.ObjectId(cycleId),
       managerId: manager._id,
@@ -316,7 +307,6 @@ async function getManagerEffectivenessData(goalSheets: any[], cycleId: string) {
 
     const completionRate = teamSize > 0 ? Math.round((checkIns.length / teamSize) * 100) : 0;
 
-    // Get average approval time (submitted → approved)
     const managerSheets = goalSheets.filter(
       (sheet: any) => sheet.employeeId?.managerId?.toString() === manager._id.toString()
     );
@@ -344,7 +334,6 @@ async function getManagerEffectivenessData(goalSheets: any[], cycleId: string) {
     });
   }
 
-  // Sort by completion rate
   managerData.sort((a, b) => b.completionRate - a.completionRate);
 
   return {

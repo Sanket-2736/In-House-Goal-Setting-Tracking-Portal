@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Find goal sheet
     const goalSheet = await GoalSheet.findById(goalSheetId);
 
     if (!goalSheet) {
@@ -34,7 +33,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify ownership
     if (goalSheet.employeeId.toString() !== user.id) {
       return NextResponse.json(
         { error: "Unauthorized" },
@@ -42,7 +40,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate goals
     if (!goalSheet.goals || goalSheet.goals.length === 0) {
       return NextResponse.json(
         { error: "Goal sheet must contain at least one goal" },
@@ -57,7 +54,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate weightage
     const totalWeightage = goalSheet.goals.reduce(
       (sum, goal) => sum + (goal.weightage || 0),
       0
@@ -70,7 +66,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate each goal
     for (const goal of goalSheet.goals) {
       if (!goal.title || !goal.thrustArea || !goal.uomType) {
         return NextResponse.json(
@@ -101,13 +96,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Update goal sheet status
     const previousStatus = goalSheet.status;
     goalSheet.status = "submitted";
     goalSheet.submittedAt = new Date();
     await goalSheet.save();
 
-    // Create audit log
     await createAuditLog({
       entityType: "GoalSheet",
       entityId: goalSheet._id,

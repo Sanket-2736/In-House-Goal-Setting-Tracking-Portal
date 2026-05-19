@@ -165,8 +165,8 @@ export function NotificationBell() {
                 }}
               >
                 <div
-                  className={`px-4 py-3 border-b hover:bg-gray-50 cursor-pointer transition-colors ${
-                    !notification.isRead ? "bg-blue-50" : ""
+                  className={`px-4 py-3 border-b hover:bg-muted cursor-pointer transition-colors dark:hover:bg-muted/50 ${
+                    !notification.isRead ? "bg-blue-50 dark:bg-blue-950/30" : ""
                   }`}
                 >
                   <div className="flex gap-3">

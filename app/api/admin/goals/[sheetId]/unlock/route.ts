@@ -45,15 +45,12 @@ export async function POST(
       );
     }
 
-    // Store previous status
     const previousStatus = goalSheet.status;
 
-    // Unlock the sheet
     goalSheet.status = "approved";
     goalSheet.lockedAt = undefined;
     await goalSheet.save();
 
-    // Create audit log
     await AuditLog.create({
       entityType: "GoalSheet",
       entityId: new Types.ObjectId(sheetId),

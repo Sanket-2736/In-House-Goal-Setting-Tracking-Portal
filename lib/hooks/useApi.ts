@@ -52,7 +52,6 @@ export function useApi() {
 
         const data: ApiResponse<T> = await response.json();
 
-        // Log API call
         logger.apiCall(method, url, response.status, duration, data);
 
         if (!response.ok) {
@@ -72,7 +71,6 @@ export function useApi() {
           return null;
         }
 
-        // Success
         const successMsg = successMessage || data.message || "Success";
         if (showToast && successMessage) {
           toast.success(successMsg);
@@ -104,9 +102,6 @@ export function useApi() {
   return { call, loading, error };
 }
 
-/**
- * Convenience function for GET requests
- */
 export async function apiGet<T = any>(
   url: string,
   options?: UseApiOptions
@@ -146,9 +141,6 @@ export async function apiGet<T = any>(
   }
 }
 
-/**
- * Convenience function for POST requests
- */
 export async function apiPost<T = any>(
   url: string,
   body?: any,
@@ -193,9 +185,6 @@ export async function apiPost<T = any>(
   }
 }
 
-/**
- * Convenience function for PUT requests
- */
 export async function apiPut<T = any>(
   url: string,
   body?: any,
@@ -240,9 +229,6 @@ export async function apiPut<T = any>(
   }
 }
 
-/**
- * Convenience function for DELETE requests
- */
 export async function apiDelete<T = any>(
   url: string,
   options?: UseApiOptions

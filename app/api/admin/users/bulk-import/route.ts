@@ -45,14 +45,12 @@ export async function POST(request: NextRequest) {
       const row = csvData[i];
 
       try {
-        // Validate required fields
         if (!row.name || !row.email || !row.role) {
           results.errors.push(`Row ${i + 1}: Missing required fields (name, email, role)`);
           results.failed++;
           continue;
         }
 
-        // Check if user already exists
         const existingUser = await User.findOne({ email: row.email });
         if (existingUser) {
           results.errors.push(`Row ${i + 1}: User with email ${row.email} already exists`);
@@ -60,7 +58,6 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Find manager if managerEmail provided
         let managerId = undefined;
         if (row.managerEmail) {
           const manager = await User.findOne({ email: row.managerEmail });
@@ -75,11 +72,9 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        // Generate temporary password
         const tempPassword = Math.random().toString(36).slice(-8);
         const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-        // Create user
         await User.create({
           name: row.name,
           email: row.email,

@@ -74,7 +74,6 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Check if cycle exists
     const cycle = await GoalCycle.findById(cycleId);
     if (!cycle) {
       return NextResponse.json(
@@ -83,7 +82,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find or create goal sheet
     let goalSheet = await GoalSheet.findOne({
       employeeId: new Types.ObjectId(user.id),
       cycleId: new Types.ObjectId(cycleId),

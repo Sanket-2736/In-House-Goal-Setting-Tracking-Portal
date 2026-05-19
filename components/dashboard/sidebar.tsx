@@ -75,7 +75,16 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
   };
 
   const isActive = (href: string) => {
-    return pathname === href || pathname.startsWith(href + "/");
+    // Find the nav item with the longest href that matches the current pathname
+    const matchingItems = navItems.filter(item => 
+      pathname === item.href || pathname.startsWith(item.href + "/")
+    );
+    
+    // Sort by length (descending) to get the most specific match
+    matchingItems.sort((a, b) => b.href.length - a.href.length);
+    
+    // Only return true if this href is the most specific match
+    return matchingItems.length > 0 && matchingItems[0].href === href;
   };
 
   return (
@@ -137,7 +146,7 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
                     "flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     active
                       ? "bg-primary text-primary-foreground"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-muted/50"
                   )}
                 >
                   <Icon className="w-5 h-5 flex-shrink-0" />
@@ -149,13 +158,13 @@ export function Sidebar({ session, isOpen = true, onClose }: SidebarProps) {
 
           {/* Footer */}
           <div className="border-t border-border p-4 space-y-2">
-            <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors">
+            <Link href="/settings" className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 transition-colors">
               <Settings className="w-5 h-5" />
               <span>Settings</span>
             </Link>
             <button
               onClick={() => signOut({ callbackUrl: "/" })}
-              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground dark:hover:bg-muted/50 transition-colors"
             >
               <LogOut className="w-5 h-5" />
               <span>Sign Out</span>

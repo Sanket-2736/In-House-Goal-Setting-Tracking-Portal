@@ -4,7 +4,7 @@ export interface IUser extends Document {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
-  password?: string; // Optional for OAuth users
+  password?: string;
   image?: string;
   role: "employee" | "manager" | "admin";
   managerId?: mongoose.Types.ObjectId;
@@ -33,7 +33,7 @@ const userSchema = new Schema<IUser>(
     },
     password: {
       type: String,
-      select: false, // Don't include password by default in queries
+      select: false,
     },
     image: {
       type: String,
@@ -53,7 +53,7 @@ const userSchema = new Schema<IUser>(
     employeeId: {
       type: String,
       unique: true,
-      sparse: true, // Allow null values for unique index
+      sparse: true,
     },
     provider: {
       type: String,
@@ -70,7 +70,6 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-// Index for faster queries
 userSchema.index({ email: 1 });
 userSchema.index({ employeeId: 1 });
 userSchema.index({ role: 1 });

@@ -29,7 +29,6 @@ export async function generateCheckInSummary(
     throw new Error("At least one achievement is required");
   }
 
-  // Format achievements for the AI prompt
   const achievementsText = achievements
     .map(
       (achievement, index) => `
@@ -44,7 +43,6 @@ Goal ${index + 1}: ${achievement.goalTitle}
     )
     .join("\n");
 
-  // Calculate summary statistics
   const completedGoals = achievements.filter((a) => a.status === "completed").length;
   const onTrackGoals = achievements.filter((a) => a.status === "on_track").length;
   const notStartedGoals = achievements.filter((a) => a.status === "not_started").length;
@@ -120,10 +118,9 @@ Keep the tone professional, empathetic, and constructive.`;
       throw new Error("No response from Cerebras API");
     }
 
-    // Clean up the response - remove any markdown formatting
     const cleanedContent = content
-      .replace(/^```[\w]*\n?/, "") // Remove opening code block
-      .replace(/\n?```$/, "") // Remove closing code block
+      .replace(/^```[\w]*\n?/, "")
+      .replace(/\n?```$/, "")
       .trim();
 
     return cleanedContent;
@@ -133,9 +130,6 @@ Keep the tone professional, empathetic, and constructive.`;
   }
 }
 
-/**
- * Validate comment length
- */
 export function validateComment(comment: string): { valid: boolean; error?: string } {
   if (!comment || comment.trim().length === 0) {
     return { valid: false, error: "Comment cannot be empty" };

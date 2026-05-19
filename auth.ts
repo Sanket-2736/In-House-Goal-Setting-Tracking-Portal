@@ -25,19 +25,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           await connectDB();
 
-          // Find user by email
           const user = await User.findOne({ email: credentials.email }).select("+password");
 
           if (!user) {
             throw new Error("Invalid email or password");
           }
 
-          // Check if password is set (credentials provider)
           if (!user.password) {
             throw new Error("This account uses a different sign-in method");
           }
 
-          // Compare passwords
           const isPasswordValid = await bcrypt.compare(
             credentials.password as string,
             user.password as string
@@ -47,7 +44,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             throw new Error("Invalid email or password");
           }
 
-          // Return user object for JWT
           return {
             id: user._id.toString(),
             email: user.email,
@@ -71,11 +67,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           await connectDB();
 
-          // Check if user exists
           let existingUser = await User.findOne({ email: user.email });
 
           if (!existingUser) {
-            // Create new user for Google OAuth
             existingUser = await User.create({
               name: user.name || (profile as any).name || "User",
               email: user.email,
@@ -86,7 +80,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             });
           }
 
-          // Update user object with MongoDB ID
           user.id = existingUser._id.toString();
         } catch (error) {
           console.error("Error in signIn callback:", error);
@@ -104,7 +97,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
 
-        // Fetch full user data from database
         try {
           await connectDB();
           const dbUser = await User.findById(user.id);

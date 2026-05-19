@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    // Only admins can access audit logs
     if (user.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized: Only admins can access audit logs" },
@@ -31,10 +30,8 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
-    // Build query
     const query: any = {};
 
-    // Date range filter
     if (fromDate || toDate) {
       query.timestamp = {};
       if (fromDate) {
@@ -45,24 +42,20 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // User filter
     if (userId) {
       query.changedBy = new Types.ObjectId(userId);
     }
 
-    // Entity type filter
     if (entityType) {
       query.entityType = entityType;
     }
 
-    // Fetch audit logs
     const auditLogs = await AuditLog.find(query)
       .populate("changedBy", "name email")
       .sort({ timestamp: -1 })
       .limit(limit)
       .skip(skip);
 
-    // Get total count
     const totalCount = await AuditLog.countDocuments(query);
 
     return NextResponse.json({

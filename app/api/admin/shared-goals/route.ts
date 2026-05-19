@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    // Only admins can view shared goals
     if (user.role !== "admin") {
       return NextResponse.json(
         { error: "Unauthorized: Only admins can view shared goals" },
@@ -80,7 +79,6 @@ export async function POST(request: NextRequest) {
       defaultWeightage = 10,
     } = body;
 
-    // Validation
     if (!title || !thrustArea || !uomType || !target || !cycleId || !recipientIds || recipientIds.length === 0) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -97,7 +95,6 @@ export async function POST(request: NextRequest) {
 
     await connectDB();
 
-    // Verify cycle exists
     const cycle = await GoalCycle.findById(cycleId);
     if (!cycle) {
       return NextResponse.json(
@@ -106,7 +103,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify all recipients exist
     const recipients = await User.find({
       _id: { $in: recipientIds.map((id: string) => new Types.ObjectId(id)) },
       role: "employee",
@@ -119,7 +115,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create shared goal
     const sharedGoal = await SharedGoal.create({
       title,
       description,
@@ -132,11 +127,10 @@ export async function POST(request: NextRequest) {
       recipients: recipientIds.map((id: string, index: number) => ({
         employeeId: new Types.ObjectId(id),
         weightage: defaultWeightage,
-        isPrimaryOwner: index === 0, // First recipient is primary owner
+        isPrimaryOwner: index === 0,
       })),
     });
 
-    // Push shared goal to each recipient's goal sheet
     for (const recipientId of recipientIds) {
       let goalSheet = await GoalSheet.findOne({
         employeeId: new Types.ObjectId(recipientId),
@@ -144,7 +138,6 @@ export async function POST(request: NextRequest) {
       });
 
       if (!goalSheet) {
-        // Create goal sheet if it doesn't exist
         goalSheet = await GoalSheet.create({
           employeeId: new Types.ObjectId(recipientId),
           cycleId: new Types.ObjectId(cycleId),
@@ -153,7 +146,6 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // Add shared goal to goal sheet
       goalSheet.goals.push({
         thrustArea,
         title,
@@ -170,7 +162,6 @@ export async function POST(request: NextRequest) {
 
       await goalSheet.save();
 
-      // Update recipient in shared goal with goalSheetId
       const recipientIndex = sharedGoal.recipients.findIndex(
         (r) => r.employeeId.toString() === recipientId
       );
@@ -181,7 +172,6 @@ export async function POST(request: NextRequest) {
 
     await sharedGoal.save();
 
-    // Create audit log
     await AuditLog.create({
       entityType: "SharedGoal",
       entityId: sharedGoal._id,

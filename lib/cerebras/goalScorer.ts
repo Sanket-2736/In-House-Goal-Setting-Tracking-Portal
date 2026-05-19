@@ -2,13 +2,13 @@ import { IGoalItem } from "@/lib/models/GoalSheet";
 
 export interface GoalQualityScore {
   goalIndex: number;
-  score: number; // 1-10
+  score: number;
   strengths: string[];
   suggestions: string[];
 }
 
 export interface GoalQualityReport {
-  overallScore: number; // 1-10
+  overallScore: number;
   goals: GoalQualityScore[];
   summary: string;
 }
@@ -28,7 +28,6 @@ export async function analyzeGoalQuality(goals: IGoalItem[]): Promise<GoalQualit
     throw new Error("At least one goal is required for analysis");
   }
 
-  // Format goals for the AI prompt
   const goalsText = goals
     .map(
       (goal, index) => `
@@ -109,7 +108,6 @@ Return ONLY valid JSON in this exact format:
       throw new Error("No response from Cerebras API");
     }
 
-    // Parse the JSON response
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       throw new Error("Could not parse AI response as JSON");
@@ -117,7 +115,6 @@ Return ONLY valid JSON in this exact format:
 
     const report: GoalQualityReport = JSON.parse(jsonMatch[0]);
 
-    // Validate response structure
     if (!report.overallScore || !Array.isArray(report.goals) || !report.summary) {
       throw new Error("Invalid response structure from AI");
     }
@@ -129,18 +126,12 @@ Return ONLY valid JSON in this exact format:
   }
 }
 
-/**
- * Get color for score visualization
- */
 export function getScoreColor(score: number): string {
   if (score >= 8) return "text-green-600 dark:text-green-400";
   if (score >= 6) return "text-yellow-600 dark:text-yellow-400";
   return "text-red-600 dark:text-red-400";
 }
 
-/**
- * Get background color for score visualization
- */
 export function getScoreBgColor(score: number): string {
   if (score >= 8) return "bg-green-50 dark:bg-green-950";
   if (score >= 6) return "bg-yellow-50 dark:bg-yellow-950";

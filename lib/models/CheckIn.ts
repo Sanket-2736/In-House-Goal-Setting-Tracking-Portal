@@ -54,7 +54,6 @@ const checkInSchema = new Schema<ICheckIn>(
   }
 );
 
-// Index for faster queries
 checkInSchema.index({ goalSheetId: 1 });
 checkInSchema.index({ managerId: 1 });
 checkInSchema.index({ employeeId: 1 });

@@ -62,7 +62,6 @@ const escalationLogSchema = new Schema<IEscalationLog>(
   }
 );
 
-// Index for faster queries
 escalationLogSchema.index({ userId: 1, triggerType: 1 });
 escalationLogSchema.index({ ruleId: 1 });
 escalationLogSchema.index({ status: 1 });
