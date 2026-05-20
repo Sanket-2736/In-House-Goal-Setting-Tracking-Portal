@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    // Only admins can access reports
-    if (user.role !== "admin") {
+    // Only admins and managers can access reports
+    if (user.role !== "admin" && user.role !== "manager") {
       return NextResponse.json(
-        { error: "Unauthorized: Only admins can access reports" },
+        { error: "Unauthorized: Only admins and managers can access reports" },
         { status: 403 }
       );
     }
@@ -40,6 +40,16 @@ export async function GET(request: NextRequest) {
       cycleId: new Types.ObjectId(cycleId),
       status: { $in: ["approved", "locked"] }, // Only approved/locked sheets
     };
+
+    if (user.role === "manager") {
+      // Get all employees under this manager
+      const employees = await User.find({
+        managerId: new Types.ObjectId(user.id),
+        isActive: true,
+      }).select("_id");
+      const employeeIds = employees.map((emp) => emp._id);
+      query.employeeId = { $in: employeeIds };
+    }
 
     // Fetch goal sheets with employee info
     let goalSheets = await GoalSheet.find(query)

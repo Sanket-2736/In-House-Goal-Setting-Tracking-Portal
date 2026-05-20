@@ -267,7 +267,7 @@ export default function ManagerDashboard() {
           </Link>
         </Button>
         <Button variant="outline" asChild>
-          <Link href="/admin/reports">
+          <Link href="/manager/reports">
             View Reports
           </Link>
         </Button>

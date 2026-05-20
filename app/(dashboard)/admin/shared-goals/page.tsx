@@ -82,6 +82,8 @@ export default function SharedGoalsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<SharedGoal | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -255,6 +257,11 @@ export default function SharedGoalsPage() {
 
   const handlePushToEmployees = async (sharedGoalId: string) => {
     toast.success("Shared goal already pushed to all recipients");
+  };
+
+  const handleViewGoal = (goal: SharedGoal) => {
+    setSelectedGoal(goal);
+    setViewDialogOpen(true);
   };
 
   const thrustAreas = [
@@ -560,8 +567,13 @@ export default function SharedGoalsPage() {
                 </TableHeader>
                 <TableBody>
                   {sharedGoals.map((goal) => (
-                    <TableRow key={goal._id}>
-                      <TableCell className="font-medium">{goal.title}</TableCell>
+                    <TableRow key={goal._id} className="cursor-pointer hover:bg-muted/50">
+                      <TableCell 
+                        className="font-medium text-primary hover:underline"
+                        onClick={() => handleViewGoal(goal)}
+                      >
+                        {goal.title}
+                      </TableCell>
                       <TableCell>
                         <Badge variant="outline">{goal.thrustArea}</Badge>
                       </TableCell>
@@ -581,7 +593,7 @@ export default function SharedGoalsPage() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handlePushToEmployees(goal._id)}
+                          onClick={() => handleViewGoal(goal)}
                         >
                           View
                         </Button>
@@ -601,6 +613,105 @@ export default function SharedGoalsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* View Goal Details Dialog */}
+      <Dialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Shared Goal Details</DialogTitle>
+            <DialogDescription>
+              View detailed information about this shared goal
+            </DialogDescription>
+          </DialogHeader>
+          {selectedGoal && (
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-semibold">Goal Title</Label>
+                <p className="text-lg font-medium mt-1">{selectedGoal.title}</p>
+              </div>
+
+              {selectedGoal.description && (
+                <div>
+                  <Label className="text-sm font-semibold">Description</Label>
+                  <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">
+                    {selectedGoal.description}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-semibold">Thrust Area</Label>
+                  <p className="text-sm mt-1">
+                    <Badge variant="outline">{selectedGoal.thrustArea}</Badge>
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">UoM Type</Label>
+                  <p className="text-sm mt-1">
+                    <Badge variant="secondary">
+                      {selectedGoal.uomType.replace(/_/g, " ")}
+                    </Badge>
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-semibold">Target</Label>
+                  <p className="text-sm mt-1">{selectedGoal.target}</p>
+                </div>
+                {selectedGoal.targetDate && (
+                  <div>
+                    <Label className="text-sm font-semibold">Target Date</Label>
+                    <p className="text-sm mt-1">
+                      {new Date(selectedGoal.targetDate).toLocaleDateString()}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <Label className="text-sm font-semibold">Recipients ({selectedGoal.recipients.length})</Label>
+                <div className="mt-2 space-y-2 max-h-48 overflow-y-auto">
+                  {selectedGoal.recipients.map((recipient, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                    >
+                      <div>
+                        <p className="font-medium text-sm">
+                          {recipient.employeeId.name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {recipient.employeeId.email} • {recipient.employeeId.department}
+                        </p>
+                      </div>
+                      <Badge variant="outline">{recipient.weightage}%</Badge>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-semibold">Created By</Label>
+                  <p className="text-sm mt-1">{selectedGoal.createdBy.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {selectedGoal.createdBy.email}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm font-semibold">Created On</Label>
+                  <p className="text-sm mt-1">
+                    {new Date(selectedGoal.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

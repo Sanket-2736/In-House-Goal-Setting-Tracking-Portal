@@ -148,3 +148,79 @@ export async function PUT(
     return NextResponse.json({ error: message }, { status: statusCode });
   }
 }
+
+/**
+ * DELETE /api/manager/approvals/[sheetId]
+ * Delete individual goal from goal sheet
+ */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ sheetId: string }> }
+) {
+  try {
+    const manager = await requireRole("manager");
+
+    const { sheetId } = await params;
+
+    const goalId = request.nextUrl.searchParams.get("goalId");
+
+    if (!goalId) {
+      return NextResponse.json(
+        { error: "goalId is required" },
+        { status: 400 }
+      );
+    }
+
+    await connectDB();
+
+    const goalSheet = await GoalSheet.findById(sheetId);
+
+    if (!goalSheet) {
+      return NextResponse.json(
+        { error: "Goal sheet not found" },
+        { status: 404 }
+      );
+    }
+
+    const employee = await User.findById(goalSheet.employeeId);
+
+    if (!employee || employee.managerId?.toString() !== manager.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 403 }
+      );
+    }
+
+    const existingGoal = goalSheet.goals.find(
+      (g) => g._id?.toString() === goalId
+    );
+
+    if (!existingGoal) {
+      return NextResponse.json(
+        { error: "Goal not found" },
+        { status: 404 }
+      );
+    }
+
+    goalSheet.goals = goalSheet.goals.filter(
+      (g) => g._id?.toString() !== goalId
+    );
+
+    await goalSheet.save();
+
+    return NextResponse.json({
+      success: true,
+      message: "Goal deleted successfully",
+      data: goalSheet,
+    });
+  } catch (error) {
+    console.error("Error deleting goal:", error);
+
+    const { message, statusCode } = handleDBError(error);
+
+    return NextResponse.json(
+      { error: message },
+      { status: statusCode }
+    );
+  }
+}

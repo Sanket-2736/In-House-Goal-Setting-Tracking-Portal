@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireRole } from "@/lib/auth/session";
+import { requireRole, requireAuth } from "@/lib/auth/session";
 import { connectDB } from "@/lib/db/mongoose";
 import { GoalCycle } from "@/lib/models";
 import { handleDBError } from "@/lib/db/utils";
@@ -11,7 +11,7 @@ import { Types } from "mongoose";
  */
 export async function GET(request: NextRequest) {
   try {
-    await requireRole("admin");
+    await requireAuth();
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");

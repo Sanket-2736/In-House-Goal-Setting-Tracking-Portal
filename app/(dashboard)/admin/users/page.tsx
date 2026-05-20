@@ -129,19 +129,32 @@ export default function AdminUsersPage() {
 
   const handleToggleUserStatus = async (user: User) => {
     try {
+      console.log("Toggling user status for:", user._id);
+      console.log("Current isActive:", user.isActive);
+      console.log("New isActive:", !user.isActive);
+      
       const response = await fetch(`/api/admin/users/${user._id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isActive: !user.isActive }),
       });
 
+      console.log("Response status:", response.status);
+      
       if (!response.ok) {
-        throw new Error("Failed to update user status");
+        const errorData = await response.json();
+        console.error("API error:", errorData);
+        throw new Error(errorData.error || "Failed to update user status");
       }
 
+      const result = await response.json();
+      console.log("Update result:", result);
+      
       await fetchUsers();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update user status");
+      const errorMsg = err instanceof Error ? err.message : "Failed to update user status";
+      console.error("Error in handleToggleUserStatus:", errorMsg);
+      setError(errorMsg);
     }
   };
 

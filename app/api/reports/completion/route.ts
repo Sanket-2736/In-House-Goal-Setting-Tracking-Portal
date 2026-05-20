@@ -13,10 +13,10 @@ export async function GET(request: NextRequest) {
   try {
     const user = await requireAuth();
 
-    // Only admins can access reports
-    if (user.role !== "admin") {
+    // Only admins and managers can access reports
+    if (user.role !== "admin" && user.role !== "manager") {
       return NextResponse.json(
-        { error: "Unauthorized: Only admins can access reports" },
+        { error: "Unauthorized: Only admins and managers can access reports" },
         { status: 403 }
       );
     }
@@ -39,6 +39,16 @@ export async function GET(request: NextRequest) {
     const submissionQuery: any = {
       cycleId: new Types.ObjectId(cycleId),
     };
+
+    let teamIds: any[] = [];
+    if (user.role === "manager") {
+      const team = await User.find({
+        managerId: new Types.ObjectId(user.id),
+        isActive: true,
+      }).select("_id");
+      teamIds = team.map((m) => m._id);
+      submissionQuery.employeeId = { $in: teamIds };
+    }
 
     let goalSheets = await GoalSheet.find(submissionQuery)
       .populate("employeeId", "name email department employeeId managerId")
@@ -64,7 +74,11 @@ export async function GET(request: NextRequest) {
     }));
 
     // Manager Check-in Status
-    const managers = await User.find({ role: "manager" }).select("_id name");
+    let managersQuery: any = { role: "manager" };
+    if (user.role === "manager") {
+      managersQuery = { _id: new Types.ObjectId(user.id) };
+    }
+    const managers = await User.find(managersQuery).select("_id name");
 
     const managerCheckInStatus = [];
 

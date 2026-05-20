@@ -316,16 +316,20 @@ export default function ManagerCheckInReviewPage() {
       </div>
 
       {/* Overall Progress */}
-      <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+      <Card className="p-6 bg-zinc-900 border-zinc-800 text-white">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-semibold mb-2">Weighted Average Progress</h3>
-            <p className="text-sm text-muted-foreground">
+            <h3 className="font-semibold mb-2">
+              Weighted Average Progress
+            </h3>
+
+            <p className="text-sm text-zinc-400">
               Based on goal weightages and achievement scores
             </p>
           </div>
+
           <div className="text-right">
-            <div className="text-4xl font-bold text-primary">
+            <div className="text-4xl font-bold text-white">
               {checkInData.weightedProgress}%
             </div>
           </div>
