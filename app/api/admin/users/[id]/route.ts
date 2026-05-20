@@ -11,11 +11,12 @@ import bcrypt from "bcryptjs";
  */
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     console.log("PATCH /api/admin/users/[id] - Starting update");
-    console.log("User ID:", params.id);
+    console.log("User ID:", id);
     
     await requireRole("admin");
     console.log("Admin role verified");
@@ -41,14 +42,14 @@ export async function PATCH(
     }
 
     console.log("Update data:", updateData);
-    console.log("Finding and updating user with ID:", params.id);
+    console.log("Finding and updating user with ID:", id);
 
-    const user = await User.findByIdAndUpdate(params.id, updateData, {
+    const user = await User.findByIdAndUpdate(id, updateData, {
       new: true,
     });
 
     if (!user) {
-      console.error("User not found with ID:", params.id);
+      console.error("User not found with ID:", id);
       return NextResponse.json(
         { error: "User not found" },
         { status: 404 }
@@ -77,14 +78,15 @@ export async function PATCH(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await requireRole("admin");
 
     await connectDB();
 
-    const user = await User.findByIdAndDelete(params.id);
+    const user = await User.findByIdAndDelete(id);
 
     if (!user) {
       return NextResponse.json(

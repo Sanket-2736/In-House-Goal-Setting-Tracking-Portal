@@ -22,9 +22,15 @@ export async function GET() {
       );
     }
 
+    // Ensure _id is properly serialized as a string
+    const cycleData = activeCycle.toObject();
+    
     return NextResponse.json({
       success: true,
-      data: activeCycle,
+      data: {
+        ...cycleData,
+        _id: cycleData._id.toString(),
+      },
     });
   } catch (error) {
     console.error("Error fetching active cycle:", error);

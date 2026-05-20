@@ -26,8 +26,9 @@ export async function GET(request: NextRequest) {
     }
 
     if (!Types.ObjectId.isValid(cycleId)) {
+      console.error("Invalid cycleId format:", { cycleId, type: typeof cycleId, length: cycleId?.length });
       return NextResponse.json(
-        { error: "Invalid cycleId format" },
+        { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
         { status: 400 }
       );
     }
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
       employeeId: new Types.ObjectId(user.id),
       cycleId: new Types.ObjectId(cycleId),
       status: { $in: ["approved", "locked"] },
-    }).populate("cycleId");
+    });
 
     if (!goalSheet) {
       return NextResponse.json(
@@ -66,7 +67,7 @@ export async function GET(request: NextRequest) {
     const goalsWithAchievements = goalSheet.goals.map((goal) => {
       const achievement = goal.achievements?.find((a) => a.quarter === quarter);
       return {
-        goalId: goal._id,
+        goalId: goal._id?.toString() || "",
         title: goal.title,
         description: goal.description,
         thrustArea: goal.thrustArea,
@@ -84,13 +85,15 @@ export async function GET(request: NextRequest) {
       };
     });
 
+    const goalSheetObj = goalSheet.toObject();
+    
     return NextResponse.json({
       success: true,
       data: {
-        checkInId: checkIn._id,
-        goalSheetId: goalSheet._id,
+        checkInId: checkIn._id.toString(),
+        goalSheetId: goalSheet._id.toString(),
         quarter,
-        cycleId: goalSheet.cycleId,
+        cycleId: cycleId,
         goals: goalsWithAchievements,
       },
     });
@@ -129,8 +132,9 @@ export async function POST(request: NextRequest) {
     }
 
     if (!Types.ObjectId.isValid(cycleId)) {
+      console.error("Invalid cycleId format in POST:", { cycleId, type: typeof cycleId, length: cycleId?.length });
       return NextResponse.json(
-        { error: "Invalid cycleId format" },
+        { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
         { status: 400 }
       );
     }

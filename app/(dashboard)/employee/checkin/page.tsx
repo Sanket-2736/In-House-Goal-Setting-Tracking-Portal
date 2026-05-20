@@ -109,7 +109,7 @@ export default function CheckInPage() {
           throw new Error("Failed to fetch active cycle");
         }
         const cycleData = await cycleResponse.json();
-        activeCycleId = cycleData.data._id;
+        activeCycleId = cycleData.data._id?.toString() || cycleData.data._id;
       }
 
       if (!activeCycleId) {
@@ -128,6 +128,8 @@ export default function CheckInPage() {
         const nextDate = getNextCheckInDate(quarter, new Date().getFullYear());
         setNextCheckInDate(nextDate);
       }
+
+      console.log("Fetching check-in data with:", { quarter, cycleId: activeCycleId });
 
       const response = await fetch(
         `/api/employee/checkin?quarter=${quarter}&cycleId=${activeCycleId}`
@@ -170,7 +172,7 @@ export default function CheckInPage() {
       }));
 
       const payload = {
-        cycleId: checkInData.cycleId,
+        cycleId: String(checkInData.cycleId),
         quarter: checkInData.quarter,
         goals,
       };
@@ -210,7 +212,7 @@ export default function CheckInPage() {
       }));
 
       const payload = {
-        cycleId: checkInData.cycleId,
+        cycleId: String(checkInData.cycleId),
         quarter: checkInData.quarter,
         goals,
       };
