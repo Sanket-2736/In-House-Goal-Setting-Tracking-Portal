@@ -22,15 +22,32 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const cycleId = searchParams.get("cycleId");
+    let cycleId = searchParams.get("cycleId");
     const department = searchParams.get("department");
     const quarter = searchParams.get("quarter");
 
+    // If no cycleId provided, fetch the active cycle
     if (!cycleId) {
-      return NextResponse.json(
-        { error: "cycleId is required" },
-        { status: 400 }
-      );
+      try {
+        const cycleResponse = await fetch(
+          `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/goals/cycles/active`
+        );
+        if (cycleResponse.ok) {
+          const cycleData = await cycleResponse.json();
+          cycleId = cycleData.data?._id?.toString() || cycleData.data?._id;
+        }
+      } catch (err) {
+        console.log("Could not fetch active cycle, proceeding without cycleId");
+      }
+    }
+
+    // If still no cycleId, return empty data instead of error
+    if (!cycleId) {
+      return NextResponse.json({
+        success: true,
+        data: [],
+        count: 0,
+      });
     }
 
     await connectDB();

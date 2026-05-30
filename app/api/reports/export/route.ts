@@ -24,40 +24,64 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const format = searchParams.get("format") || "xlsx";
-    const cycleId = searchParams.get("cycleId");
+    let cycleId = searchParams.get("cycleId");
     const department = searchParams.get("department");
 
+    // If no cycleId provided, fetch the active cycle
+    if (!cycleId) {
+      try {
+        const cycleResponse = await fetch(
+          `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/api/goals/cycles/active`
+        );
+        if (cycleResponse.ok) {
+          const cycleData = await cycleResponse.json();
+          cycleId = cycleData.data?._id?.toString() || cycleData.data?._id;
+        }
+      } catch (err) {
+        console.log("Could not fetch active cycle");
+      }
+    }
+
+    // If still no cycleId, return error
     if (!cycleId) {
       return NextResponse.json(
-        { error: "cycleId is required" },
+        { error: "No active cycle found. Please specify a cycleId." },
         { status: 400 }
       );
     }
 
     await connectDB();
 
-    // Validate cycleId if not "all"
-    if (cycleId !== "all" && !Types.ObjectId.isValid(cycleId)) {
-      return NextResponse.json(
-        { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
-        { status: 400 }
-      );
-    }
-
-    // Fetch cycle info
-    const cycle = await GoalCycle.findById(cycleId);
-    if (!cycle) {
-      return NextResponse.json(
-        { error: "Cycle not found" },
-        { status: 404 }
-      );
-    }
-
     // Build query
     const query: any = {
-      cycleId: new Types.ObjectId(cycleId),
       status: { $in: ["approved", "locked"] },
     };
+
+    // Only add cycleId filter if not "all"
+    if (cycleId !== "all") {
+      if (!Types.ObjectId.isValid(cycleId)) {
+        return NextResponse.json(
+          { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
+          { status: 400 }
+        );
+      }
+      query.cycleId = new Types.ObjectId(cycleId);
+    }
+
+    // Fetch cycle info (only if specific cycle)
+    let cycle = null;
+    if (cycleId !== "all") {
+      cycle = await GoalCycle.findById(cycleId);
+      if (!cycle) {
+        return NextResponse.json(
+          { error: "Cycle not found" },
+          { status: 404 }
+        );
+      }
+    } else {
+      // Get all cycles for filename
+      cycle = { name: "All_Cycles" };
+    }
 
     if (user.role === "manager") {
       const team = await User.find({
