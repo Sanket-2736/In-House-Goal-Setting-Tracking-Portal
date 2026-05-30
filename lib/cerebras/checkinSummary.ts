@@ -89,7 +89,7 @@ Keep the tone professional, empathetic, and constructive.`;
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama3.1-8b",
+        model: "zai-glm-4.7",
         messages: [
           {
             role: "system",

@@ -467,14 +467,14 @@ export default function AnalyticsDashboardPage() {
                   <CardContent className="space-y-3">
                     {analyticsData.managerEffectiveness.topManagers.map(
                       (mgr: any, idx: number) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-green-50 rounded">
-                          <div>
-                            <p className="font-medium">{mgr.managerName}</p>
-                            <p className="text-sm text-gray-600">
-                              {mgr.checkInsCompleted}/{mgr.teamSize} check-ins
+                        <div key={idx} className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{mgr.managerName}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {mgr.checkInsCompleted}/{mgr.teamSize} check-ins completed
                             </p>
                           </div>
-                          <Badge className="bg-green-600">
+                          <Badge className="bg-green-600 text-white ml-4 whitespace-nowrap">
                             {mgr.completionRate}%
                           </Badge>
                         </div>
@@ -493,14 +493,14 @@ export default function AnalyticsDashboardPage() {
                   <CardContent className="space-y-3">
                     {analyticsData.managerEffectiveness.bottomManagers.map(
                       (mgr: any, idx: number) => (
-                        <div key={idx} className="flex items-center justify-between p-3 bg-red-50 rounded">
-                          <div>
-                            <p className="font-medium">{mgr.managerName}</p>
-                            <p className="text-sm text-gray-600">
-                              {mgr.checkInsCompleted}/{mgr.teamSize} check-ins
+                        <div key={idx} className="flex items-center justify-between p-4 bg-red-50 rounded-lg border border-red-200">
+                          <div className="flex-1">
+                            <p className="font-semibold text-gray-900">{mgr.managerName}</p>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {mgr.checkInsCompleted}/{mgr.teamSize} check-ins completed
                             </p>
                           </div>
-                          <Badge className="bg-red-600">
+                          <Badge className="bg-red-600 text-white ml-4 whitespace-nowrap">
                             {mgr.completionRate}%
                           </Badge>
                         </div>

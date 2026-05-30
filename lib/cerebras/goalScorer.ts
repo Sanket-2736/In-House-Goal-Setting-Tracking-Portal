@@ -79,7 +79,7 @@ Return ONLY valid JSON in this exact format:
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "llama3.1-8b",
+        model: "zai-glm-4.7",
         messages: [
           {
             role: "system",

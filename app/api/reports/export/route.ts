@@ -36,6 +36,14 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
+    // Validate cycleId if not "all"
+    if (cycleId !== "all" && !Types.ObjectId.isValid(cycleId)) {
+      return NextResponse.json(
+        { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
+        { status: 400 }
+      );
+    }
+
     // Fetch cycle info
     const cycle = await GoalCycle.findById(cycleId);
     if (!cycle) {

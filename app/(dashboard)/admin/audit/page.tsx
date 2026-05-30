@@ -376,56 +376,67 @@ export default function AuditTrailPage() {
           </DialogHeader>
 
           {selectedLog && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Timestamp</p>
-                  <p className="text-sm">
+                  <p className="text-sm font-semibold text-gray-900">
                     {new Date(selectedLog.timestamp).toLocaleString()}
                   </p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Changed By</p>
-                  <p className="text-sm">{selectedLog.changedBy.name}</p>
+                  <p className="text-sm font-semibold text-gray-900">{selectedLog.changedBy.name}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Entity Type</p>
-                  <p className="text-sm">{selectedLog.entityType}</p>
+                  <p className="text-sm font-semibold text-gray-900">{selectedLog.entityType}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">Change Type</p>
-                  <p className="text-sm">{selectedLog.changeType}</p>
+                  <p className="text-sm font-semibold text-gray-900">{selectedLog.changeType}</p>
                 </div>
               </div>
 
               {selectedLog.reason && (
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Reason</p>
-                  <p className="text-sm">{selectedLog.reason}</p>
+                  <p className="text-sm font-medium text-gray-600 mb-2">Reason</p>
+                  <p className="text-sm font-semibold text-gray-900">{selectedLog.reason}</p>
                 </div>
               )}
 
-              {selectedLog.previousValue && (
+              {selectedLog.previousValue && Object.keys(selectedLog.previousValue).length > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-2">
                     Previous Value
                   </p>
-                  <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-40">
-                    {JSON.stringify(selectedLog.previousValue, null, 2)}
-                  </pre>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <pre className="text-xs text-gray-700 overflow-auto max-h-40 whitespace-pre-wrap break-words">
+                      {JSON.stringify(selectedLog.previousValue, null, 2)}
+                    </pre>
+                  </div>
                 </div>
               )}
 
-              {selectedLog.newValue && (
+              {selectedLog.newValue && Object.keys(selectedLog.newValue).length > 0 && (
                 <div>
                   <p className="text-sm font-medium text-gray-600 mb-2">
                     New Value
                   </p>
-                  <pre className="bg-gray-50 p-3 rounded text-xs overflow-auto max-h-40">
-                    {JSON.stringify(selectedLog.newValue, null, 2)}
-                  </pre>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <pre className="text-xs text-gray-700 overflow-auto max-h-40 whitespace-pre-wrap break-words">
+                      {JSON.stringify(selectedLog.newValue, null, 2)}
+                    </pre>
+                  </div>
                 </div>
               )}
+
+              {(!selectedLog.previousValue || Object.keys(selectedLog.previousValue).length === 0) &&
+                (!selectedLog.newValue || Object.keys(selectedLog.newValue).length === 0) && (
+                  <div className="text-center py-6 text-gray-500">
+                    <p className="text-sm">No value changes recorded for this audit log</p>
+                  </div>
+                )}
             </div>
           )}
         </DialogContent>

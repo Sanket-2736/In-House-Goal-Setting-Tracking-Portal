@@ -10,6 +10,10 @@ export interface IUser extends Document {
   managerId?: mongoose.Types.ObjectId;
   department?: string;
   employeeId?: string;
+  phone?: string;
+  timezone?: string;
+  emailNotifications?: boolean;
+  pushNotifications?: boolean;
   provider: "credentials" | "google";
   isActive: boolean;
   createdAt: Date;
@@ -54,6 +58,21 @@ const userSchema = new Schema<IUser>(
       type: String,
       unique: true,
       sparse: true,
+    },
+    phone: {
+      type: String,
+    },
+    timezone: {
+      type: String,
+      default: "UTC",
+    },
+    emailNotifications: {
+      type: Boolean,
+      default: true,
+    },
+    pushNotifications: {
+      type: Boolean,
+      default: true,
     },
     provider: {
       type: String,

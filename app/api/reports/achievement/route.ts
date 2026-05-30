@@ -35,11 +35,23 @@ export async function GET(request: NextRequest) {
 
     await connectDB();
 
+    // Validate cycleId if not "all"
+    if (cycleId !== "all" && !Types.ObjectId.isValid(cycleId)) {
+      return NextResponse.json(
+        { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
+        { status: 400 }
+      );
+    }
+
     // Build query
     const query: any = {
-      cycleId: new Types.ObjectId(cycleId),
       status: { $in: ["approved", "locked"] }, // Only approved/locked sheets
     };
+    
+    // Only add cycleId filter if not "all"
+    if (cycleId !== "all") {
+      query.cycleId = new Types.ObjectId(cycleId);
+    }
 
     if (user.role === "manager") {
       // Get all employees under this manager

@@ -36,9 +36,18 @@ export async function GET(request: NextRequest) {
     await connectDB();
 
     // Employee Submission Status
-    const submissionQuery: any = {
-      cycleId: new Types.ObjectId(cycleId),
-    };
+    const submissionQuery: any = {};
+    
+    // Handle cycleId - if "all", don't filter by cycleId
+    if (cycleId && cycleId !== "all") {
+      if (!Types.ObjectId.isValid(cycleId)) {
+        return NextResponse.json(
+          { error: `Invalid cycleId format: "${cycleId}" is not a valid MongoDB ID` },
+          { status: 400 }
+        );
+      }
+      submissionQuery.cycleId = new Types.ObjectId(cycleId);
+    }
 
     let teamIds: any[] = [];
     if (user.role === "manager") {
@@ -95,18 +104,24 @@ export async function GET(request: NextRequest) {
       let checkInsCompleted = 0;
 
       if (quarter) {
-        const checkIns = await CheckIn.find({
-          cycleId: new Types.ObjectId(cycleId),
+        const checkInsQuery: any = {
           quarter: quarter as "Q1" | "Q2" | "Q3" | "Q4",
           employeeId: { $in: teamMembers.map((m) => m._id) },
-        });
+        };
+        if (cycleId && cycleId !== "all") {
+          checkInsQuery.cycleId = new Types.ObjectId(cycleId);
+        }
+        const checkIns = await CheckIn.find(checkInsQuery);
         checkInsCompleted = checkIns.length;
       } else {
         // Count all check-ins for the cycle
-        const checkIns = await CheckIn.find({
-          cycleId: new Types.ObjectId(cycleId),
+        const checkInsQuery: any = {
           employeeId: { $in: teamMembers.map((m) => m._id) },
-        });
+        };
+        if (cycleId && cycleId !== "all") {
+          checkInsQuery.cycleId = new Types.ObjectId(cycleId);
+        }
+        const checkIns = await CheckIn.find(checkInsQuery);
         checkInsCompleted = checkIns.length;
       }
 
