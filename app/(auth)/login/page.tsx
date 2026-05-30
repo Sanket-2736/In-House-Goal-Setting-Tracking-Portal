@@ -235,66 +235,67 @@ export default function AuthPage() {
       {/* Left Side - Gradient Background */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-primary via-primary/80 to-accent flex-col justify-center items-center p-12 relative overflow-hidden">
         {/* Decorative elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/20 rounded-full blur-3xl -mr-48 -mt-48"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/20 rounded-full blur-3xl -ml-48 -mb-48"></div>
+        <div className="absolute top-0 right-0 w-96 h-96 bg-accent/30 rounded-full blur-3xl -mr-48 -mt-48 animate-pulse"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-primary/30 rounded-full blur-3xl -ml-48 -mb-48 animate-pulse" style={{ animationDelay: "1s" }}></div>
+        <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-white/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: "2s" }}></div>
 
         {/* Content */}
         <div className="relative z-10 text-center space-y-8">
-          <div className="space-y-4">
-            <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-sm">
+          <div className="space-y-4 animate-fade-in">
+            <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto backdrop-blur-sm hover:bg-white/30 transition-all duration-300 shadow-lg">
               <span className="text-4xl font-bold text-white">AQ</span>
             </div>
-            <h1 className="text-5xl font-bold text-white">AtomQuest Goals</h1>
+            <h1 className="text-5xl font-bold text-white drop-shadow-lg">AtomQuest Goals</h1>
           </div>
 
           <div className="space-y-6 max-w-md">
-            <p className="text-xl text-white/90 font-semibold">Align. Track. Achieve.</p>
+            <p className="text-xl text-white/90 font-semibold drop-shadow">Align. Track. Achieve.</p>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-                  <span className="text-2xl">🎯</span>
+              <div className="flex items-start gap-4 group">
+                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300 shadow-md">
+                  <span className="text-2xl group-hover:scale-110 transition-transform duration-300">🎯</span>
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-white">Set Clear Goals</h3>
-                  <p className="text-white/80 text-sm">Define objectives aligned with organizational strategy</p>
+                  <h3 className="font-semibold text-white group-hover:text-white/95 transition-colors">Set Clear Goals</h3>
+                  <p className="text-white/80 text-sm group-hover:text-white/90 transition-colors">Define objectives aligned with organizational strategy</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-                  <span className="text-2xl">📊</span>
+              <div className="flex items-start gap-4 group">
+                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300 shadow-md">
+                  <span className="text-2xl group-hover:scale-110 transition-transform duration-300">📊</span>
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-white">Track Progress</h3>
-                  <p className="text-white/80 text-sm">Monitor quarterly achievements and stay on track</p>
+                  <h3 className="font-semibold text-white group-hover:text-white/95 transition-colors">Track Progress</h3>
+                  <p className="text-white/80 text-sm group-hover:text-white/90 transition-colors">Monitor quarterly achievements and stay on track</p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm">
-                  <span className="text-2xl">🚀</span>
+              <div className="flex items-start gap-4 group">
+                <div className="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center flex-shrink-0 backdrop-blur-sm group-hover:bg-white/30 transition-all duration-300 shadow-md">
+                  <span className="text-2xl group-hover:scale-110 transition-transform duration-300">🚀</span>
                 </div>
                 <div className="text-left">
-                  <h3 className="font-semibold text-white">Achieve Success</h3>
-                  <p className="text-white/80 text-sm">Reach your goals with collaborative support</p>
+                  <h3 className="font-semibold text-white group-hover:text-white/95 transition-colors">Achieve Success</h3>
+                  <p className="text-white/80 text-sm group-hover:text-white/90 transition-colors">Reach your goals with collaborative support</p>
                 </div>
               </div>
             </div>
 
             {/* Three Dashboards Info */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-lg">
               <p className="text-sm font-semibold text-white mb-3">3 Different Dashboards:</p>
               <div className="space-y-2 text-xs text-white/90">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 hover:text-white transition-colors">
                   <Building2 className="w-4 h-4" />
                   <span><strong>Admin:</strong> Manage system & users</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 hover:text-white transition-colors">
                   <Users className="w-4 h-4" />
                   <span><strong>Manager:</strong> Approve goals & reviews</span>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 hover:text-white transition-colors">
                   <CheckCircle2 className="w-4 h-4" />
                   <span><strong>Employee:</strong> Create & track goals</span>
                 </div>
@@ -346,7 +347,7 @@ export default function AuthPage() {
                     return (
                       <div
                         key={account.email}
-                        className="border border-border rounded-lg p-4 hover:bg-accent/50 transition-colors"
+                        className="border border-border rounded-lg p-4 hover:shadow-lg hover:border-primary/50 hover:bg-accent/30 transition-all duration-300"
                       >
                         <div className="flex items-start justify-between mb-2">
                           <div className="flex items-center gap-3">
