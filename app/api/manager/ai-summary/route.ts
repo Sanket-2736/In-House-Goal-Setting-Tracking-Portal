@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireRole } from "@/lib/auth/session";
-import { generateCheckInSummary, CheckInAchievementData } from "@/lib/cerebras/checkinSummary";
+import { generateCheckInSummary, CheckInAchievementData } from "@/lib/gemini/checkinSummary";
 
 /**
  * POST /api/manager/ai-summary
@@ -37,16 +37,12 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error generating AI summary:", error);
 
-    // Return a user-friendly error message
-    const errorMessage =
-      error instanceof Error ? error.message : "Failed to generate AI summary";
-
+    // Return user-friendly message for all errors
     return NextResponse.json(
       {
-        error: errorMessage,
-        suggestion: "Please write the comment manually or try again later",
+        error: "AI suggestions temporarily unavailable. Please try again later.",
       },
-      { status: 500 }
+      { status: 503 }
     );
   }
 }

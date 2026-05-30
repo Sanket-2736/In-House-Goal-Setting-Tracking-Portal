@@ -1,4 +1,4 @@
-import { IGoalItem } from "@/lib/models/GoalSheet";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export interface CheckInAchievementData {
   goalTitle: string;
@@ -11,7 +11,7 @@ export interface CheckInAchievementData {
 }
 
 /**
- * Generate AI-powered check-in comment using Cerebras
+ * Generate AI-powered check-in comment using Google Gemini
  * Analyzes employee's quarterly achievement data and generates constructive feedback
  */
 export async function generateCheckInSummary(
@@ -19,10 +19,10 @@ export async function generateCheckInSummary(
   quarter: string,
   achievements: CheckInAchievementData[]
 ): Promise<string> {
-  const apiKey = process.env.CEREBRAS_API_KEY;
+  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
   if (!apiKey) {
-    throw new Error("CEREBRAS_API_KEY is not configured");
+    throw new Error("GOOGLE_GEMINI_API_KEY is not configured");
   }
 
   if (!achievements || achievements.length === 0) {
@@ -51,71 +51,58 @@ Goal ${index + 1}: ${achievement.goalTitle}
   );
   const lowProgressGoals = achievements.filter((a) => a.progressScore < 50);
 
-  const systemPrompt = `You are an empathetic and constructive HR manager assistant. Your role is to provide meaningful, professional check-in feedback that:
-1. Acknowledges genuine wins and progress
-2. Identifies risks on low-progress goals with empathy
-3. Provides one concrete, actionable suggestion for improvement
-4. Maintains a supportive, growth-oriented tone
+  const systemPrompt = `You are a direct, professional manager providing concise check-in feedback. Keep responses SHORT and ACTION-FOCUSED.
+- Be direct and specific
+- Reference actual numbers and goals
+- Provide clear next steps
+- Keep it under 100 words
+- Professional but brief tone`;
 
-Write in first person as the manager. Be specific, reference actual goals and numbers. Keep it professional but warm.`;
+  const userPrompt = `Write a brief check-in comment for ${employeeName} for ${quarter}.
 
-  const userPrompt = `Please write a professional check-in comment for ${employeeName} for ${quarter}. 
-
-Summary of their performance:
+Performance Summary:
 - Total Goals: ${achievements.length}
 - Completed: ${completedGoals}
 - On Track: ${onTrackGoals}
 - Not Started: ${notStartedGoals}
 - Average Progress: ${averageProgress}%
-${lowProgressGoals.length > 0 ? `- Goals with low progress (<50%): ${lowProgressGoals.length}` : ""}
+${lowProgressGoals.length > 0 ? `- Low Progress Goals: ${lowProgressGoals.length}` : ""}
 
-Detailed Achievement Data:
+Goals:
 ${achievementsText}
 
-Please write a check-in comment (150-200 words) that:
-1. Opens with acknowledgment of their overall performance
-2. Highlights specific wins (goals with high progress scores)
-3. If there are low-progress goals, address them with empathy and ask about blockers
-4. Provides one concrete suggestion for the next quarter
-5. Closes with encouragement
+Write a SHORT (50-80 words), direct check-in comment that:
+1. States current status clearly
+2. Identifies key blockers if any
+3. Specifies one clear next action
 
-Keep the tone professional, empathetic, and constructive.`;
+Be concise and professional.`;
 
   try {
-    const response = await fetch("https://api.cerebras.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "zai-glm-4.7",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: userPrompt,
-          },
-        ],
+    const client = new GoogleGenerativeAI(apiKey);
+    const model = client.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+    const response = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `${systemPrompt}\n\n${userPrompt}`,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
         temperature: 0.7,
-        max_tokens: 1000,
-      }),
+        maxOutputTokens: 300,
+      },
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error("Cerebras API error:", error);
-      throw new Error(`Cerebras API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const content = response.response.text();
 
     if (!content) {
-      throw new Error("No response from Cerebras API");
+      throw new Error("No response from Gemini API");
     }
 
     const cleanedContent = content
@@ -125,7 +112,7 @@ Keep the tone professional, empathetic, and constructive.`;
 
     return cleanedContent;
   } catch (error) {
-    console.error("Error generating check-in summary with Cerebras:", error);
+    console.error("Error generating check-in summary with Gemini:", error);
     throw error;
   }
 }

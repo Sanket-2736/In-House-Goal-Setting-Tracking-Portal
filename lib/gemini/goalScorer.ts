@@ -1,4 +1,5 @@
 import { IGoalItem } from "@/lib/models/GoalSheet";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export interface GoalQualityScore {
   goalIndex: number;
@@ -14,14 +15,14 @@ export interface GoalQualityReport {
 }
 
 /**
- * Analyze goal quality using Cerebras AI
+ * Analyze goal quality using Google Gemini AI
  * Evaluates goals against SMART criteria (Specific, Measurable, Achievable, Relevant, Time-bound)
  */
 export async function analyzeGoalQuality(goals: IGoalItem[]): Promise<GoalQualityReport> {
-  const apiKey = process.env.CEREBRAS_API_KEY;
+  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
 
   if (!apiKey) {
-    throw new Error("CEREBRAS_API_KEY is not configured");
+    throw new Error("GOOGLE_GEMINI_API_KEY is not configured");
   }
 
   if (!goals || goals.length === 0) {
@@ -72,40 +73,30 @@ Return ONLY valid JSON in this exact format:
 }`;
 
   try {
-    const response = await fetch("https://api.cerebras.ai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "zai-glm-4.7",
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          {
-            role: "user",
-            content: `Please analyze these goals:\n${goalsText}`,
-          },
-        ],
+    const client = new GoogleGenerativeAI(apiKey);
+    const model = client.getGenerativeModel({ model: "gemini-3-flash-preview" });
+
+    const response = await model.generateContent({
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: `${systemPrompt}\n\nPlease analyze these goals:\n${goalsText}`,
+            },
+          ],
+        },
+      ],
+      generationConfig: {
         temperature: 0.7,
-        max_tokens: 2000,
-      }),
+        maxOutputTokens: 2000,
+      },
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      console.error("Cerebras API error:", error);
-      throw new Error(`Cerebras API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content;
+    const content = response.response.text();
 
     if (!content) {
-      throw new Error("No response from Cerebras API");
+      throw new Error("No response from Gemini API");
     }
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -121,7 +112,7 @@ Return ONLY valid JSON in this exact format:
 
     return report;
   } catch (error) {
-    console.error("Error analyzing goals with Cerebras:", error);
+    console.error("Error analyzing goals with Gemini:", error);
     throw error;
   }
 }

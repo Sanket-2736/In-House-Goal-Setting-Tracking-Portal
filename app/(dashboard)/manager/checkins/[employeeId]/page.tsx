@@ -127,13 +127,14 @@ export default function ManagerCheckInReviewPage() {
 
       if (!response.ok) {
         const result = await response.json();
-        throw new Error(result.error || "Failed to generate AI summary");
+        setAiError("AI suggestions temporarily unavailable. Please write the comment manually.");
+        return;
       }
 
       const result = await response.json();
       setComment(result.data.summary);
     } catch (err) {
-      setAiError(err instanceof Error ? err.message : "Failed to generate summary");
+      setAiError("AI suggestions temporarily unavailable. Please write the comment manually.");
     } finally {
       setAiLoading(false);
     }

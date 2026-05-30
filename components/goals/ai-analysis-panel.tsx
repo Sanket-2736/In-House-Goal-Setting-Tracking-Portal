@@ -1,6 +1,6 @@
 "use client";
 
-import { GoalQualityReport, getScoreColor, getScoreBgColor } from "@/lib/cerebras/goalScorer";
+import { GoalQualityReport, getScoreColor, getScoreBgColor } from "@/lib/gemini/goalScorer";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Badge } from "@/components/ui/badge";
 import {

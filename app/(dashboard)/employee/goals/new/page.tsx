@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AIAnalysisPanel } from "@/components/goals/ai-analysis-panel";
-import { GoalQualityReport } from "@/lib/cerebras/goalScorer";
+import { GoalQualityReport } from "@/lib/gemini/goalScorer";
 import { Trash2, Plus, Sparkles, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 
 const THRUST_AREAS = [

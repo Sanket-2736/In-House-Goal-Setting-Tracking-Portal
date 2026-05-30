@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/auth/session";
-import { analyzeGoalQuality } from "@/lib/cerebras/goalScorer";
+import { analyzeGoalQuality } from "@/lib/gemini/goalScorer";
 
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
@@ -65,18 +65,10 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error analyzing goals:", error);
 
-    if (error instanceof Error) {
-      if (error.message.includes("CEREBRAS_API_KEY")) {
-        return NextResponse.json(
-          { error: "AI analysis is not available at this time" },
-          { status: 503 }
-        );
-      }
-    }
-
+    // Return user-friendly message for all errors
     return NextResponse.json(
-      { error: "Failed to analyze goals. Please try again." },
-      { status: 500 }
+      { error: "AI suggestions temporarily unavailable. Please try again later." },
+      { status: 503 }
     );
   }
 }
