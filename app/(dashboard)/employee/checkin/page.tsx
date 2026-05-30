@@ -389,7 +389,7 @@ export default function CheckInPage() {
           );
 
           return (
-            <Card key={goal.goalId} className="p-6">
+            <Card key={goal.goalId} className="p-6 hover:shadow-lg hover:border-primary/50 transition-all duration-300 cursor-default">
               <div className="space-y-4">
                 {/* Goal Header */}
                 <div className="flex items-start justify-between">
@@ -530,24 +530,19 @@ export default function CheckInPage() {
       </div>
 
       {/* Summary */}
-      <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
-        <div className="flex items-center justify-between">
+      <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:shadow-lg hover:border-blue-300 transition-all duration-300">
+        <div className="grid grid-cols-3 gap-6">
           <div>
-            <h3 className="font-semibold mb-2">Overall Progress</h3>
-            <div className="space-y-1 text-sm">
-              <p>
-                <span className="text-muted-foreground">Total Goals:</span>
-                <span className="ml-2 font-medium">{checkInData.goals.length}</span>
-              </p>
-              <p>
-                <span className="text-muted-foreground">Average Progress:</span>
-                <span className="ml-2 font-medium">{totalProgressScore}%</span>
-              </p>
-            </div>
+            <p className="text-sm text-muted-foreground mb-2">Total Goals</p>
+            <p className="text-3xl font-bold text-primary">{checkInData.goals.length}</p>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold text-primary">{totalProgressScore}%</div>
-            <p className="text-sm text-muted-foreground mt-1">
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Average Progress</p>
+            <p className="text-3xl font-bold text-primary">{totalProgressScore}%</p>
+          </div>
+          <div>
+            <p className="text-sm text-muted-foreground mb-2">Status</p>
+            <p className="text-lg font-semibold text-primary">
               {getProgressScoreLabel(totalProgressScore)}
             </p>
           </div>
