@@ -1,5 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-
 export interface CheckInAchievementData {
   goalTitle: string;
   thrustArea: string;
@@ -11,7 +9,7 @@ export interface CheckInAchievementData {
 }
 
 /**
- * Generate AI-powered check-in comment using Google Gemini
+ * Generate AI-powered check-in comment using Cerebras
  * Analyzes employee's quarterly achievement data and generates constructive feedback
  */
 export async function generateCheckInSummary(
@@ -19,10 +17,12 @@ export async function generateCheckInSummary(
   quarter: string,
   achievements: CheckInAchievementData[]
 ): Promise<string> {
-  const apiKey = process.env.GOOGLE_GEMINI_API_KEY;
+  const apiKey = process.env.CEREBRAS_API_KEY;
+  const baseUrl = process.env.CEREBRAS_BASE_URL;
+  const model = process.env.CEREBRAS_MODEL || "gpt-oss-120b";
 
   if (!apiKey) {
-    throw new Error("GOOGLE_GEMINI_API_KEY is not configured");
+    throw new Error("CEREBRAS_API_KEY is not configured");
   }
 
   if (!achievements || achievements.length === 0) {
@@ -79,30 +79,40 @@ Write a SHORT (50-80 words), direct check-in comment that:
 Be concise and professional.`;
 
   try {
-    const client = new GoogleGenerativeAI(apiKey);
-    const model = client.getGenerativeModel({ model: "gemini-3-flash-preview" });
-
-    const response = await model.generateContent({
-      contents: [
-        {
-          role: "user",
-          parts: [
-            {
-              text: `${systemPrompt}\n\n${userPrompt}`,
-            },
-          ],
-        },
-      ],
-      generationConfig: {
-        temperature: 0.7,
-        maxOutputTokens: 300,
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
       },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          {
+            role: "user",
+            content: userPrompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 300,
+      }),
     });
 
-    const content = response.response.text();
+    if (!response.ok) {
+      const error = await response.json();
+      console.error("Cerebras API error:", error);
+      throw new Error(`Cerebras API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content;
 
     if (!content) {
-      throw new Error("No response from Gemini API");
+      throw new Error("No response from Cerebras API");
     }
 
     const cleanedContent = content
@@ -112,7 +122,7 @@ Be concise and professional.`;
 
     return cleanedContent;
   } catch (error) {
-    console.error("Error generating check-in summary with Gemini:", error);
+    console.error("Error generating check-in summary with Cerebras:", error);
     throw error;
   }
 }
