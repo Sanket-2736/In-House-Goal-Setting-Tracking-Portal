@@ -129,7 +129,6 @@ export default function CheckInPage() {
         setNextCheckInDate(nextDate);
       }
 
-      console.log("Fetching check-in data with:", { quarter, cycleId: activeCycleId });
 
       const response = await fetch(
         `/api/employee/checkin?quarter=${quarter}&cycleId=${activeCycleId}`
@@ -177,9 +176,6 @@ export default function CheckInPage() {
         goals,
       };
 
-      console.log("=== AUTO-SAVE REQUEST ===");
-      console.log("Payload:", JSON.stringify(payload, null, 2));
-
       const response = await fetch("/api/employee/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -187,13 +183,6 @@ export default function CheckInPage() {
       });
 
       const responseData = await response.json();
-      console.log("Auto-save response:", responseData);
-
-      if (!response.ok) {
-        console.error("Auto-save failed:", responseData);
-      } else {
-        console.log("Auto-save successful");
-      }
     } catch (err) {
       console.error("Auto-save failed:", err);
     }
@@ -217,34 +206,21 @@ export default function CheckInPage() {
         goals,
       };
 
-      console.log("=== SENDING CHECK-IN SAVE REQUEST ===");
-      console.log("Payload:", JSON.stringify(payload, null, 2));
-      console.log("cycleId type:", typeof checkInData.cycleId);
-      console.log("cycleId value:", checkInData.cycleId);
-      console.log("quarter:", checkInData.quarter);
-      console.log("goals count:", goals.length);
-
       const response = await fetch("/api/employee/checkin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
 
-      console.log("Response status:", response.status);
       const responseData = await response.json();
-      console.log("Response data:", responseData);
 
       if (!response.ok) {
-        console.error("Save failed with status:", response.status);
-        console.error("Error response:", responseData);
         throw new Error(responseData.error || "Failed to save check-in");
       }
 
-      console.log("Check-in saved successfully");
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      console.error("Save error:", err);
       setError(err instanceof Error ? err.message : "Failed to save");
     } finally {
       setSaving(false);

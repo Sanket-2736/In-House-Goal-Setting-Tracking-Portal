@@ -58,20 +58,17 @@ export default function AdminDashboard() {
         const auditResponse = await apiGet("/api/admin/audit?limit=5", { showToast: false });
         if (auditResponse?.success && auditResponse.data) {
           setRecentActivity(auditResponse.data);
-          console.log("Audit logs fetched:", auditResponse.data);
         }
         
         // Fetch active cycle
         const cycleResponse = await apiGet("/api/goals/cycles/active", { showToast: false });
         if (cycleResponse?.success && cycleResponse.data) {
           const cycle = cycleResponse.data;
-          console.log("Active cycle:", cycle);
           
           // Fetch completion report for submission and completion rates
           const completionResponse = await apiGet("/api/reports/completion", { showToast: false });
           if (completionResponse?.success && completionResponse.data) {
             const completionData = completionResponse.data;
-            console.log("Completion data:", completionData);
             
             const totalEmployees = completionData.totalEmployees || 0;
             const submitted = completionData.submitted || 0;

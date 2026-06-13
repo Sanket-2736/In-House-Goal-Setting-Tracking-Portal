@@ -99,23 +99,18 @@ export default function AdminUsersPage() {
       if (roleFilter && roleFilter !== "all") params.append("role", roleFilter);
       if (departmentFilter && departmentFilter !== "all") params.append("department", departmentFilter);
 
-      console.log("Fetching users with params:", params.toString());
       const response = await fetch(`/api/admin/users?${params}`);
 
-      console.log("Response status:", response.status);
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("API error:", errorData);
         throw new Error(errorData.error || "Failed to fetch users");
       }
 
       const result = await response.json();
-      console.log("Users fetched:", result);
       setUsers(result.data);
       setPagination(result.pagination);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "An error occurred";
-      console.error("Error in fetchUsers:", errorMsg);
       setError(errorMsg);
     } finally {
       setLoading(false);
@@ -129,9 +124,6 @@ export default function AdminUsersPage() {
 
   const handleToggleUserStatus = async (user: User) => {
     try {
-      console.log("Toggling user status for:", user._id);
-      console.log("Current isActive:", user.isActive);
-      console.log("New isActive:", !user.isActive);
       
       const response = await fetch(`/api/admin/users/${user._id}`, {
         method: "PATCH",
@@ -139,21 +131,16 @@ export default function AdminUsersPage() {
         body: JSON.stringify({ isActive: !user.isActive }),
       });
 
-      console.log("Response status:", response.status);
       
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("API error:", errorData);
         throw new Error(errorData.error || "Failed to update user status");
       }
 
       const result = await response.json();
-      console.log("Update result:", result);
-      
       await fetchUsers();
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Failed to update user status";
-      console.error("Error in handleToggleUserStatus:", errorMsg);
       setError(errorMsg);
     }
   };
